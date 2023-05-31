@@ -3,7 +3,8 @@ package com.vaadin.intgen;
 import javax.swing.JButton;
 
 public class ButtonGenerator implements ComponentGenerator {
-    private static final String[] BUTTON_TEXTS = { "Submit", "Cancel", "Reset", "Close", "Help" };
+
+    private static final String[] BUTTON_TEXTS = {"Submit", "Cancel", "Reset", "Close", "Help"};
 
     @Override
     public JButton generate() {
@@ -16,5 +17,5 @@ public class ButtonGenerator implements ComponentGenerator {
     public String getCategory() {
         return "Button";
     }
-    
+
 }

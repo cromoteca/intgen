@@ -28,6 +28,7 @@ import javax.swing.plaf.metal.OceanTheme;
 public class Intgen {
 
     private static final class WindowAdapterExtension extends WindowAdapter {
+
         private final JFrame frame;
         private final int imageId;
         private final CountDownLatch latch;
@@ -71,9 +72,9 @@ public class Intgen {
     }
 
     public static final Random RANDOM = new Random();
-    public static final ComponentGenerator[] GENERATORS = new ComponentGenerator[] {
-            new ButtonGenerator(),
-            new TextFieldWithTopLabelGenerator()
+    public static final ComponentGenerator[] GENERATORS = new ComponentGenerator[]{
+        new ButtonGenerator(),
+        new TextFieldWithTopLabelGenerator()
     };
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -107,7 +108,7 @@ public class Intgen {
 
         new File("target/output").mkdirs();
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 200; i++) {
             CountDownLatch latch = new CountDownLatch(1);
             int id = i + 1;
 
@@ -171,7 +172,7 @@ public class Intgen {
         }
 
         // Add 2-5 random components
-        int componentCount = 2 + RANDOM.nextInt(6);
+        int componentCount = 2 + RANDOM.nextInt(7);
         for (int i = 0; i < componentCount; i++) {
             ComponentGenerator generator = GENERATORS[RANDOM.nextInt(GENERATORS.length)];
             Component component = generator.generate();
@@ -183,27 +184,28 @@ public class Intgen {
     private static int idCounter = 0;
 
     private static void printComponentDetails(Component component, JFrame relativeTo, int imageId) {
-        Point position = SwingUtilities.convertPoint(component, 0, 0, relativeTo);
-        Dimension size = component.getSize();
-        float area = size.width * size.height;
+        Integer categoryId = categoryMap.get(component.getName());
 
-        ObjectNode componentDetails = annotations.addObject();
-        componentDetails.put("image_id", imageId);
-        componentDetails.put("id", idCounter++);
-        ArrayNode bbox = componentDetails.putArray("bbox");
-        bbox.add(position.x);
-        bbox.add(position.y);
-        bbox.add(size.width);
-        bbox.add(size.height);
-        componentDetails.put("area", area);
-        componentDetails.put("category_id", categoryMap.get(component.getName()));
-        System.out.println("NAME:"+component.getName());
+        if (categoryId != null) {
+            Point position = SwingUtilities.convertPoint(component, 0, 0, relativeTo);
+            Dimension size = component.getSize();
+            float area = size.width * size.height;
+
+            ObjectNode componentDetails = annotations.addObject();
+            componentDetails.put("image_id", imageId);
+            componentDetails.put("id", idCounter++);
+            ArrayNode bbox = componentDetails.putArray("bbox");
+            bbox.add(position.x);
+            bbox.add(position.y);
+            bbox.add(size.width);
+            bbox.add(size.height);
+            componentDetails.put("area", area);
+            componentDetails.put("category_id", categoryMap.get(component.getName()));
+        }
 
         if (component instanceof Container container) {
             for (Component child : container.getComponents()) {
-                if (child.getName() != null) {
-                    printComponentDetails(child, relativeTo, imageId);
-                }
+                printComponentDetails(child, relativeTo, imageId);
             }
         }
     }

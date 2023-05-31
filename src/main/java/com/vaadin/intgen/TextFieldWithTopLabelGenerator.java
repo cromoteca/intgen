@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class TextFieldWithTopLabelGenerator implements ComponentGenerator {
+
     private static final String[] LABEL_TEXTS = {"First name", "Last name", "Email", "City", "Country"};
 
     @Override
@@ -26,5 +27,5 @@ public class TextFieldWithTopLabelGenerator implements ComponentGenerator {
     public String getCategory() {
         return "TextFieldWithTopLabel";
     }
-    
+
 }
