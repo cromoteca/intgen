@@ -1,12 +1,24 @@
 package com.vaadin.intgen;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.HeadlessException;
+import java.awt.Point;
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
 import javax.imageio.ImageIO;
 import javax.swing.plaf.metal.DefaultMetalTheme;
 import javax.swing.plaf.metal.MetalLookAndFeel;
@@ -18,17 +30,38 @@ public class Intgen {
     private static final String[] LABEL_TEXTS = {"First name", "Last name", "Email", "City", "Country"};
     private static final String[] BUTTON_TEXTS = {"Submit", "Cancel", "Reset", "Close", "Help"};
 
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    // Get the available look and feels
+    private static final UIManager.LookAndFeelInfo[] lookAndFeels = UIManager.getInstalledLookAndFeels();
+
     public static void main(String[] args) throws Exception {
+        for (UIManager.LookAndFeelInfo lookAndFeel : lookAndFeels) {
+            System.out.println(lookAndFeel.getName());
+        }
+
+        new File("target/output").mkdirs();
+
+        for (int i = 0; i < 3; i++) {
+            CountDownLatch latch = new CountDownLatch(1);
+            int id = i + 1;
+
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    createAndShowGui(latch, id);  // pass the latch and image id to the method
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+
+            latch.await();  // wait for the latch to count down to 0 before continuing
+        }
+    }
+
+    private static void createAndShowGui(CountDownLatch latch, int imageId) {
         SwingUtilities.invokeLater(() -> {
             try {
                 Random random = new Random();
-
-                // Get the available look and feels
-                UIManager.LookAndFeelInfo[] lookAndFeels = UIManager.getInstalledLookAndFeels();
-
-                for (UIManager.LookAndFeelInfo lookAndFeel : lookAndFeels) {
-                    System.out.println(lookAndFeel.getName());
-                }
 
                 // Choose a random look and feel
                 String lookAndFeelClassName = lookAndFeels[random.nextInt(lookAndFeels.length)].getClassName();
@@ -57,14 +90,18 @@ public class Intgen {
                         try {
                             BufferedImage capturedImage = takeScreenshot(frame);
                             // Save as PNG
-                            File file = new File("target/screenshot.png");
+                            File file = new File("target/output/screenshot" + imageId + ".png");
                             ImageIO.write(capturedImage, "png", file);
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
 
                         // Print component details
-                        printComponentDetails(frame, frame, 1);  // Assuming the image id is 1
+                        List<ObjectNode> componentDetailsList = new ArrayList<>();
+                        printComponentDetails(componentDetailsList, frame, frame, imageId);
+                        writeJsonToFile(componentDetailsList, "target/output/coordinates" + imageId + ".json");
+                        frame.dispose();
+                        latch.countDown();
                     }
                 });
 
@@ -76,7 +113,7 @@ public class Intgen {
                 }
 
                 // Add 2-5 random components
-                int componentCount = 2 + random.nextInt(4);
+                int componentCount = 2 + random.nextInt(6);
                 for (int i = 0; i < componentCount; i++) {
                     Class<?> componentClass = COMPONENTS[random.nextInt(COMPONENTS.length)];
                     if (componentClass == JTextField.class) {
@@ -93,7 +130,7 @@ public class Intgen {
                 frame.pack();
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
-            } catch (Exception e) {
+            } catch (HeadlessException | ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
                 e.printStackTrace();
             }
         });
@@ -101,22 +138,35 @@ public class Intgen {
 
     private static int idCounter = 0;
 
-    private static void printComponentDetails(Component component, JFrame relativeTo, int imageId) {
+    private static void printComponentDetails(List<ObjectNode> componentDetailsList, Component component, JFrame relativeTo, int imageId) {
         Point position = SwingUtilities.convertPoint(component, 0, 0, relativeTo);
         Dimension size = component.getSize();
         float area = size.width * size.height;
 
-        System.out.println("{");
-        System.out.println("  \"image_id\": " + imageId + ",");
-        System.out.println("  \"id\": " + idCounter++ + ",");
-        System.out.println("  \"bbox\": [" + position.x + "," + position.y + "," + size.width + "," + size.height + "],");
-        System.out.println("  \"area\": " + area);
-        System.out.println("}");
+        ObjectNode componentDetails = objectMapper.createObjectNode();
+        componentDetails.put("image_id", imageId);
+        componentDetails.put("id", idCounter++);
+        ArrayNode bbox = componentDetails.putArray("bbox");
+        bbox.add(position.x);
+        bbox.add(position.y);
+        bbox.add(size.width);
+        bbox.add(size.height);
+        componentDetails.put("area", area);
 
-        if (component instanceof Container) {
-            for (Component child : ((Container) component).getComponents()) {
-                printComponentDetails(child, relativeTo, imageId);
+        componentDetailsList.add(componentDetails);
+
+        if (component instanceof Container container) {
+            for (Component child : container.getComponents()) {
+                printComponentDetails(componentDetailsList, child, relativeTo, imageId);
             }
+        }
+    }
+
+    public static void writeJsonToFile(List<ObjectNode> componentDetailsList, String filePath) {
+        try {
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(filePath), componentDetailsList);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
