@@ -34,8 +34,9 @@ import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.OceanTheme;
 
 public class Intgen {
-    enum Phase{
-        TRAIN(200),VALID(20),TEST(20);
+
+    enum Phase {
+        TRAIN(200), VALID(20), TEST(20);
 
         private final int count;
 
@@ -48,14 +49,14 @@ public class Intgen {
         }
 
         public File getImages() {
-            return new File(DATASET, name().toLowerCase()+"/images");
+            return new File(DATASET, name().toLowerCase() + "/images");
         }
 
         public File getLabels() {
-            return new File(DATASET, name().toLowerCase()+"/labels");
+            return new File(DATASET, name().toLowerCase() + "/labels");
         }
     }
-    public static final File DATASET=new File("C:\\Users\\Shadow\\datasets\\intgen");
+    public static final File DATASET = new File("C:\\Users\\Shadow\\datasets\\intgen");
 
     public static void main(String[] args) throws Exception {
 
@@ -64,18 +65,18 @@ public class Intgen {
         }
 
         for (Phase phase : Phase.values()) {
-           phase.getImages().mkdirs();
-           phase.getLabels().mkdirs();
+            phase.getImages().mkdirs();
+            phase.getLabels().mkdirs();
 
             for (int i = 0; i < phase.getCount(); i++) {
-                makeOne(phase,i);
+                makeOne(phase, i);
             }
         }
 
         String names = Arrays.stream(GENERATORS)
-        .map(ComponentGenerator::getCategory)
-        .map(cat->"'"+cat+"'")
-        .collect(Collectors.joining(", "));
+                .map(ComponentGenerator::getCategory)
+                .map(cat -> "'" + cat + "'")
+                .collect(Collectors.joining(", "));
 
         File yaml = new File(DATASET, "data.yaml");
         try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(yaml, false)))) {
@@ -83,13 +84,13 @@ public class Intgen {
             out.println("val: ../valid/images");
             out.println("test: ../test/images");
             out.println();
-            out.println("nc: "+GENERATORS.length);
-            out.println("names: ["+names+"]");
+            out.println("nc: " + GENERATORS.length);
+            out.println("names: [" + names + "]");
         } catch (IOException ex) {
             ex.printStackTrace();
         }
 
-        objectMapper.writeValue(new File(DATASET,"_annotations.coco.json"), rootNode);
+        objectMapper.writeValue(new File(DATASET, "_annotations.coco.json"), rootNode);
     }
 
     private static void makeOne(Phase phase, int i) throws InterruptedException {
@@ -97,7 +98,7 @@ public class Intgen {
 
         SwingUtilities.invokeLater(() -> {
             try {
-                createAndShowGui(phase,latch, i); // pass the latch and image id to the method
+                createAndShowGui(phase, latch, i); // pass the latch and image id to the method
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -114,7 +115,7 @@ public class Intgen {
         private final CountDownLatch latch;
 
         private WindowAdapterExtension(Phase phase, JFrame frame, int imageId, CountDownLatch latch) {
-            this.phase=phase;
+            this.phase = phase;
             this.frame = frame;
             this.imageId = imageId;
             this.latch = latch;
@@ -125,17 +126,17 @@ public class Intgen {
             super.windowOpened(e);
 
             // Take a screenshot
-            File image = new File(phase.getImages(), imageId+".png");
-            saveScreenshot(image,imageId, frame);
+            File image = new File(phase.getImages(), imageId + ".png");
+            saveScreenshot(image, imageId, frame);
 
             // Print component details
-            File labels = new File(phase.getLabels(), imageId+".txt");
+            File labels = new File(phase.getLabels(), imageId + ".txt");
             try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(labels, false)))) {
-                printComponentDetails(out,frame, frame, imageId);
+                printComponentDetails(out, frame, frame, imageId);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
-    
+
             frame.dispose();
             latch.countDown();
         }
@@ -195,7 +196,7 @@ public class Intgen {
         }
     }
 
-    private static void createAndShowGui(Phase phase,CountDownLatch latch, int imageId) {
+    private static void createAndShowGui(Phase phase, CountDownLatch latch, int imageId) {
         SwingUtilities.invokeLater(() -> {
             try {
 
@@ -270,7 +271,7 @@ public class Intgen {
             componentDetails.put("area", area);
             componentDetails.put("category_id", categoryId);
 
-            addLine(component, relativeTo, categoryId,out);
+            addLine(component, relativeTo, categoryId, out);
         }
 
         if (component instanceof Container container) {
@@ -284,24 +285,24 @@ public class Intgen {
         Point innerLocation = inner.getLocationOnScreen();
         Point outerLocation = outer.getLocationOnScreen();
         Rectangle innerBounds = inner.getBounds();
-        
+
         // calculate relative location
         int relativeX = innerLocation.x - outerLocation.x;
         int relativeY = innerLocation.y - outerLocation.y;
-        
+
         return new Rectangle(relativeX, relativeY, innerBounds.width, innerBounds.height);
     }
 
-    public static void addLine(Component inner, Component outer, int categoryId,PrintWriter out) {
+    public static void addLine(Component inner, Component outer, int categoryId, PrintWriter out) {
         Rectangle bounds = getRelativeBounds(inner, outer);
-        
+
         // normalize coordinates and size to be between 0 and 1
         double x = bounds.getX() / outer.getWidth();
         double y = bounds.getY() / outer.getHeight();
         double w = bounds.getWidth() / outer.getWidth();
         double h = bounds.getHeight() / outer.getHeight();
-    
-            out.println(categoryId + " " + x + " " + y + " " + w + " " + h);
+
+        out.println(categoryId + " " + x + " " + y + " " + w + " " + h);
     }
 
     public static void writeJsonToFile(List<ObjectNode> componentDetailsList, String filePath) {
