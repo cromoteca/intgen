@@ -1,1 +1,3 @@
-target/
+/target/
+/runs/
+yolo*.pt
