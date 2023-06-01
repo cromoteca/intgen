@@ -7,33 +7,114 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.HeadlessException;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
+
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
+
 import javax.imageio.ImageIO;
 import javax.swing.plaf.metal.DefaultMetalTheme;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.OceanTheme;
 
 public class Intgen {
+    enum Phase{
+        TRAIN(200),VALID(20),TEST(20);
+
+        private final int count;
+
+        Phase(int count) {
+            this.count = count;
+        }
+
+        public int getCount() {
+            return count;
+        }
+
+        public File getImages() {
+            return new File(DATASET, name().toLowerCase()+"/images");
+        }
+
+        public File getLabels() {
+            return new File(DATASET, name().toLowerCase()+"/labels");
+        }
+    }
+    public static final File DATASET=new File("C:\\Users\\Shadow\\datasets\\intgen");
+
+    public static void main(String[] args) throws Exception {
+
+        for (UIManager.LookAndFeelInfo lookAndFeel : lookAndFeels) {
+            System.out.println(lookAndFeel.getName());
+        }
+
+        for (Phase phase : Phase.values()) {
+           phase.getImages().mkdirs();
+           phase.getLabels().mkdirs();
+
+            for (int i = 0; i < phase.getCount(); i++) {
+                makeOne(phase,i);
+            }
+        }
+
+        String names = Arrays.stream(GENERATORS)
+        .map(ComponentGenerator::getCategory)
+        .map(cat->"'"+cat+"'")
+        .collect(Collectors.joining(", "));
+
+        File yaml = new File(DATASET, "data.yaml");
+        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(yaml, false)))) {
+            out.println("train: ../train/images");
+            out.println("val: ../valid/images");
+            out.println("test: ../test/images");
+            out.println();
+            out.println("nc: "+GENERATORS.length);
+            out.println("names: ["+names+"]");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        objectMapper.writeValue(new File(DATASET,"_annotations.coco.json"), rootNode);
+    }
+
+    private static void makeOne(Phase phase, int i) throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(1);
+
+        SwingUtilities.invokeLater(() -> {
+            try {
+                createAndShowGui(phase,latch, i); // pass the latch and image id to the method
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+
+        latch.await(); // wait for the latch to count down to 0 before continuing
+    }
 
     private static final class WindowAdapterExtension extends WindowAdapter {
 
+        private final Phase phase;
         private final JFrame frame;
         private final int imageId;
         private final CountDownLatch latch;
 
-        private WindowAdapterExtension(JFrame frame, int imageId, CountDownLatch latch) {
+        private WindowAdapterExtension(Phase phase, JFrame frame, int imageId, CountDownLatch latch) {
+            this.phase=phase;
             this.frame = frame;
             this.imageId = imageId;
             this.latch = latch;
@@ -44,21 +125,28 @@ public class Intgen {
             super.windowOpened(e);
 
             // Take a screenshot
-            saveScreenshot(imageId, frame);
+            File image = new File(phase.getImages(), imageId+".png");
+            saveScreenshot(image,imageId, frame);
 
             // Print component details
-            printComponentDetails(frame, frame, imageId);
+            File labels = new File(phase.getLabels(), imageId+".txt");
+            try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(labels, false)))) {
+                printComponentDetails(out,frame, frame, imageId);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            }
+    
             frame.dispose();
             latch.countDown();
         }
 
-        private void saveScreenshot(int imageId, JFrame frame) {
+        private void saveScreenshot(File file, int imageId, JFrame frame) {
             try {
                 BufferedImage capturedImage = takeScreenshot(frame);
+                BufferedImage resizedImage = resizeImage(capturedImage, 512, 512);
                 // Save as PNG
                 String fileName = "screenshot" + imageId + ".png";
-                File file = new File("target/output/" + fileName);
-                ImageIO.write(capturedImage, "png", file);
+                ImageIO.write(resizedImage, "png", file);
 
                 ObjectNode imageNode = images.addObject();
                 imageNode.put("id", imageId);
@@ -68,6 +156,14 @@ public class Intgen {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
+        }
+
+        public static BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
+            BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+            Graphics2D graphics2D = resizedImage.createGraphics();
+            graphics2D.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
+            graphics2D.dispose();
+            return resizedImage;
         }
     }
 
@@ -91,42 +187,15 @@ public class Intgen {
     static {
         for (int i = 0; i < GENERATORS.length; i++) {
             ComponentGenerator generator = GENERATORS[i];
-            int categoryId = i + 1;
-            categoryMap.put(generator.getCategory(), categoryId);
+            categoryMap.put(generator.getCategory(), i);
             ObjectNode categoryNode = categories.addObject();
             categoryNode.put("supercategory", "Boxes");
-            categoryNode.put("id", categoryId);
+            categoryNode.put("id", i);
             categoryNode.put("name", generator.getCategory());
         }
     }
 
-    public static void main(String[] args) throws Exception {
-
-        for (UIManager.LookAndFeelInfo lookAndFeel : lookAndFeels) {
-            System.out.println(lookAndFeel.getName());
-        }
-
-        new File("target/output").mkdirs();
-
-        for (int i = 0; i < 200; i++) {
-            CountDownLatch latch = new CountDownLatch(1);
-            int id = i + 1;
-
-            SwingUtilities.invokeLater(() -> {
-                try {
-                    createAndShowGui(latch, id); // pass the latch and image id to the method
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-
-            latch.await(); // wait for the latch to count down to 0 before continuing
-        }
-
-        objectMapper.writeValue(new File("target/output/_annotations.coco.json"), rootNode);
-    }
-
-    private static void createAndShowGui(CountDownLatch latch, int imageId) {
+    private static void createAndShowGui(Phase phase,CountDownLatch latch, int imageId) {
         SwingUtilities.invokeLater(() -> {
             try {
 
@@ -148,7 +217,7 @@ public class Intgen {
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
                 // Add a WindowListener to wait for the windowOpened event
-                frame.addWindowListener(new WindowAdapterExtension(frame, imageId, latch));
+                frame.addWindowListener(new WindowAdapterExtension(phase, frame, imageId, latch));
 
                 addFields(frame);
 
@@ -156,8 +225,7 @@ public class Intgen {
                 frame.pack();
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
-            } catch (HeadlessException | ClassNotFoundException | IllegalAccessException | InstantiationException
-                    | UnsupportedLookAndFeelException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         });
@@ -176,14 +244,14 @@ public class Intgen {
         for (int i = 0; i < componentCount; i++) {
             ComponentGenerator generator = GENERATORS[RANDOM.nextInt(GENERATORS.length)];
             Component component = generator.generate();
-            frame.add(component);
             component.setName(generator.getCategory());
+            frame.add(component);
         }
     }
 
     private static int idCounter = 0;
 
-    private static void printComponentDetails(Component component, JFrame relativeTo, int imageId) {
+    private static void printComponentDetails(PrintWriter out, Component component, Component relativeTo, int imageId) {
         Integer categoryId = categoryMap.get(component.getName());
 
         if (categoryId != null) {
@@ -200,14 +268,40 @@ public class Intgen {
             bbox.add(size.width);
             bbox.add(size.height);
             componentDetails.put("area", area);
-            componentDetails.put("category_id", categoryMap.get(component.getName()));
+            componentDetails.put("category_id", categoryId);
+
+            addLine(component, relativeTo, categoryId,out);
         }
 
         if (component instanceof Container container) {
             for (Component child : container.getComponents()) {
-                printComponentDetails(child, relativeTo, imageId);
+                printComponentDetails(out, child, relativeTo, imageId);
             }
         }
+    }
+
+    public static Rectangle getRelativeBounds(Component inner, Component outer) {
+        Point innerLocation = inner.getLocationOnScreen();
+        Point outerLocation = outer.getLocationOnScreen();
+        Rectangle innerBounds = inner.getBounds();
+        
+        // calculate relative location
+        int relativeX = innerLocation.x - outerLocation.x;
+        int relativeY = innerLocation.y - outerLocation.y;
+        
+        return new Rectangle(relativeX, relativeY, innerBounds.width, innerBounds.height);
+    }
+
+    public static void addLine(Component inner, Component outer, int categoryId,PrintWriter out) {
+        Rectangle bounds = getRelativeBounds(inner, outer);
+        
+        // normalize coordinates and size to be between 0 and 1
+        double x = bounds.getX() / outer.getWidth();
+        double y = bounds.getY() / outer.getHeight();
+        double w = bounds.getWidth() / outer.getWidth();
+        double h = bounds.getHeight() / outer.getHeight();
+    
+            out.println(categoryId + " " + x + " " + y + " " + w + " " + h);
     }
 
     public static void writeJsonToFile(List<ObjectNode> componentDetailsList, String filePath) {
