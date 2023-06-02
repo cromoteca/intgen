@@ -25,12 +25,17 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -159,10 +164,9 @@ public class Intgen {
         new TextAreaWithTopLabel()
     };
 
-    // Get the available look and feels
     private static final UIManager.LookAndFeelInfo[] lookAndFeels;
-
     private static final Map<String, Integer> categoryMap = new HashMap<>();
+    private static final List<String> WORDS;
 
     static {
         Stream.of(FlatDarculaLaf.class, FlatDarkLaf.class, FlatIntelliJLaf.class, FlatLightLaf.class, FlatMacLightLaf.class, FlatMacDarkLaf.class).forEach(laf -> {
@@ -173,6 +177,39 @@ public class Intgen {
             var generator = GENERATORS[i];
             categoryMap.put(generator.getCategory(), i);
         }
+
+        try {
+            var uri = Path.of(Intgen.class.getResource("/wordlist.txt").toURI());
+            WORDS = Files.readAllLines(uri);
+        } catch (IOException | URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static String words(int min, int max) {
+        return IntStream.rangeClosed(min, min + RANDOM.nextInt(max - min + 1))
+                .mapToObj(n -> WORDS.get(RANDOM.nextInt(WORDS.size())))
+                .collect(Collectors.joining(" "));
+    }
+
+    private static final String[] emojis = {
+        "\u2705", // Check Mark
+        "\u274C", // Cross Mark
+        "\u26A0", // Warning
+        "\u2757", // Exclamation Mark
+        "\uD83D\uDEAB", // No Entry
+        "\uD83D\uDE4F", // Clapping Hands
+        "\uD83D\uDC4D", // Thumbs Up
+        "\uD83D\uDC4E", // Thumbs Down
+        "\uD83D\uDCD1", // File Folder
+        "\uD83D\uDCE6", // Inbox Tray
+        "\uD83D\uDCE8", // Outbox Tray
+        "\uD83D\uDCDD", // Notebook
+        "\uD83D\uDCDD\uD83D\uDCD0", // Notebook with Decorative Cover
+    };
+
+    public static String emoji() {
+        return emojis[RANDOM.nextInt(emojis.length)];
     }
 
     private static void createAndShowGui(Phase phase, CountDownLatch latch, int imageId) {

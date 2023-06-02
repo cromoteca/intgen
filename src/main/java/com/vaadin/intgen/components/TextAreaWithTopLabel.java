@@ -1,6 +1,7 @@
 package com.vaadin.intgen.components;
 
 import com.vaadin.intgen.ComponentGenerator;
+import com.vaadin.intgen.Intgen;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -13,7 +14,7 @@ public class TextAreaWithTopLabel implements ComponentGenerator {
     @Override
     public Component generate() {
         var panel = new JPanel(new BorderLayout());
-        var label = new JLabel("LABEL");
+        var label = new JLabel(Intgen.words(1, 3));
         var textArea = new JTextArea();
         textArea.setPreferredSize(new Dimension(400, 200));
 
@@ -21,11 +22,6 @@ public class TextAreaWithTopLabel implements ComponentGenerator {
         panel.add(textArea, BorderLayout.CENTER);
 
         return panel;
-    }
-
-    @Override
-    public String getCategory() {
-        return "TextAreaWithTopLabel";
     }
 
 }

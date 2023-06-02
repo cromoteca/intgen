@@ -4,7 +4,9 @@ import java.awt.Component;
 
 public interface ComponentGenerator {
 
-    public Component generate();
+    Component generate();
 
-    public String getCategory();
+    default String getCategory() {
+        return getClass().getSimpleName();
+    }
 }

@@ -11,12 +11,10 @@ import javax.swing.JTextField;
 
 public class TextFieldWithTopLabel implements ComponentGenerator {
 
-    private static final String[] LABEL_TEXTS = {"First name", "Last name", "Email", "City", "Country"};
-
     @Override
     public JPanel generate() {
         var panel = new JPanel(new BorderLayout());
-        var label = new JLabel(LABEL_TEXTS[Intgen.RANDOM.nextInt(LABEL_TEXTS.length)]);
+        var label = new JLabel(Intgen.words(1, 3));
         var textField = new JTextField();
         textField.setPreferredSize(new Dimension(100, textField.getPreferredSize().height));
 
@@ -24,11 +22,6 @@ public class TextFieldWithTopLabel implements ComponentGenerator {
         panel.add(textField, BorderLayout.CENTER);
 
         return panel;
-    }
-
-    @Override
-    public String getCategory() {
-        return "TextFieldWithTopLabel";
     }
 
 }
