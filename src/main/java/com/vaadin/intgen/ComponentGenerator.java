@@ -4,7 +4,13 @@ import java.awt.Component;
 
 public interface ComponentGenerator {
 
-    Component generate();
+    default Component generate() {
+        var component = _generate();
+        component.setName(getCategory());
+        return component;
+    }
+
+    Component _generate();
 
     default String getCategory() {
         return getClass().getSimpleName();

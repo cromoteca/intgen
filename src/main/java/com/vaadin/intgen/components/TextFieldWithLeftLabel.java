@@ -12,7 +12,7 @@ import javax.swing.JTextField;
 public class TextFieldWithLeftLabel implements ComponentGenerator {
 
     @Override
-    public JPanel generate() {
+    public JPanel _generate() {
         var panel = new JPanel(new BorderLayout());
         var label = new JLabel(Intgen.words(1, 3));
         var textField = new JTextField();

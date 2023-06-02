@@ -9,7 +9,7 @@ import javax.swing.JCheckBox;
 public class Checkbox implements ComponentGenerator {
 
     @Override
-    public Component generate() {
+    public Component _generate() {
         return new JCheckBox(Intgen.words(2, 6), Intgen.RANDOM.nextBoolean());
     }
 

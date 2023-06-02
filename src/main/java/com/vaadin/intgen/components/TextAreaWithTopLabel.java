@@ -12,11 +12,13 @@ import javax.swing.JTextArea;
 public class TextAreaWithTopLabel implements ComponentGenerator {
 
     @Override
-    public Component generate() {
+    public Component _generate() {
         var panel = new JPanel(new BorderLayout());
         var label = new JLabel(Intgen.words(1, 3));
         var textArea = new JTextArea();
-        textArea.setPreferredSize(new Dimension(400, 200));
+        var w = Intgen.RANDOM.nextInt(100, 200);
+        var h = Intgen.RANDOM.nextInt(30, Math.min(w - 40, 100));
+        textArea.setPreferredSize(new Dimension(w, h));
 
         panel.add(label, BorderLayout.NORTH);
         panel.add(textArea, BorderLayout.CENTER);

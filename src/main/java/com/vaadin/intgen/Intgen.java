@@ -12,9 +12,10 @@ import com.vaadin.intgen.components.ComboBox;
 import com.vaadin.intgen.components.TextAreaWithTopLabel;
 import com.vaadin.intgen.components.TextFieldWithLeftLabel;
 import com.vaadin.intgen.components.TextFieldWithTopLabel;
+import com.vaadin.intgen.layouts.HorizontalLayout;
+import com.vaadin.intgen.layouts.VerticalLayout;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.FlowLayout;
 import java.awt.HeadlessException;
 import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
@@ -28,6 +29,7 @@ import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -66,7 +68,7 @@ public class Intgen {
             return new File(DATASET, name().toLowerCase() + "/labels");
         }
     }
-    public static final int IMAGE_SIZE = 640;
+    public static final int IMAGE_SIZE = 1024;
     public static final File DATASET = new File("target/dataset");
 
     public static void main(String[] args) throws Exception {
@@ -85,7 +87,7 @@ public class Intgen {
             }
         }
 
-        var names = Arrays.stream(GENERATORS)
+        var names = Stream.concat(Arrays.stream(LAYOUTS), Arrays.stream(COMPONENTS))
                 .map(ComponentGenerator::getCategory)
                 .map(cat -> "'" + cat + "'")
                 .collect(Collectors.joining(", "));
@@ -96,7 +98,7 @@ public class Intgen {
             out.println("val: ../valid/images");
             out.println("test: ../test/images");
             out.println();
-            out.println("nc: " + GENERATORS.length);
+            out.println("nc: " + (LAYOUTS.length + COMPONENTS.length));
             out.println("names: [" + names + "]");
         }
     }
@@ -155,7 +157,7 @@ public class Intgen {
     }
 
     public static final Random RANDOM = new Random(13579);
-    public static final ComponentGenerator[] GENERATORS = new ComponentGenerator[]{
+    public static final ComponentGenerator[] COMPONENTS = new ComponentGenerator[]{
         new Button(),
         new TextFieldWithTopLabel(),
         new TextFieldWithLeftLabel(),
@@ -163,6 +165,24 @@ public class Intgen {
         new ComboBox(),
         new TextAreaWithTopLabel()
     };
+    public static final LayoutGenerator[] LAYOUTS = new LayoutGenerator[]{
+        new HorizontalLayout(),
+        new VerticalLayout()
+    };
+
+    public static LayoutGenerator pickLayout(String parentCategory) {
+        LayoutGenerator layout = null;
+
+        while (layout == null) {
+            var candidate = LAYOUTS[RANDOM.nextInt(LAYOUTS.length)];
+
+            if (parentCategory == null || !candidate.forbid(parentCategory)) {
+                layout = candidate;
+            }
+        }
+
+        return layout;
+    }
 
     private static final UIManager.LookAndFeelInfo[] lookAndFeels;
     private static final Map<String, Integer> categoryMap = new HashMap<>();
@@ -173,9 +193,11 @@ public class Intgen {
             UIManager.installLookAndFeel(laf.getSimpleName(), laf.getName());
         });
         lookAndFeels = UIManager.getInstalledLookAndFeels();
-        for (var i = 0; i < GENERATORS.length; i++) {
-            var generator = GENERATORS[i];
-            categoryMap.put(generator.getCategory(), i);
+        for (var i = 0; i < LAYOUTS.length; i++) {
+            categoryMap.put((LAYOUTS[i]).getCategory(), i);
+        }
+        for (var i = 0; i < COMPONENTS.length; i++) {
+            categoryMap.put((COMPONENTS[i]).getCategory(), i + LAYOUTS.length);
         }
 
         try {
@@ -215,11 +237,9 @@ public class Intgen {
     private static void createAndShowGui(Phase phase, CountDownLatch latch, int imageId) {
         SwingUtilities.invokeLater(() -> {
             try {
-                // Choose a random look and feel
                 var lookAndFeelClassName = lookAndFeels[RANDOM.nextInt(lookAndFeels.length)].getClassName();
                 UIManager.setLookAndFeel(lookAndFeelClassName);
 
-                // If the L&F is Metal, set a random theme
                 if (lookAndFeelClassName.equals("javax.swing.plaf.metal.MetalLookAndFeel")) {
                     if (RANDOM.nextBoolean()) {
                         MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
@@ -228,16 +248,36 @@ public class Intgen {
                     }
                 }
 
-                // Create the frame
                 var frame = new JFrame("Random Swing App");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-                // Add a WindowListener to wait for the windowOpened event
                 frame.addWindowListener(new WindowAdapterExtension(phase, frame, imageId, latch));
 
-                addFields(frame);
+                var layouts = new ArrayList<Container>();
+                var contentPane = frame.getContentPane();
+                layouts.add(contentPane);
+                frame.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
 
-                // Display the frame
+                var layoutCount = RANDOM.nextInt(0, 5);
+                for (var i = 0; i < layoutCount; i++) {
+                    var parent = layouts.get(RANDOM.nextInt(layouts.size()));
+                    var child = pickLayout(parent.getName()).generate();
+                    parent.add(child);
+                    layouts.add(child);
+                }
+
+                layouts.forEach(l -> {
+                    while (l.getComponentCount() < 2) {
+                        var component = COMPONENTS[RANDOM.nextInt(COMPONENTS.length)];
+                        l.add(component.generate());
+                    }
+                });
+
+                var componentCount = 5 + RANDOM.nextInt(40);
+                for (int i = 0; i < componentCount; i++) {
+                    var component = COMPONENTS[RANDOM.nextInt(COMPONENTS.length)];
+                    layouts.get(RANDOM.nextInt(layouts.size())).add(component.generate());
+                }
+
                 frame.pack();
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
@@ -245,24 +285,6 @@ public class Intgen {
                 throw new RuntimeException(e);
             }
         });
-    }
-
-    private static void addFields(JFrame frame) {
-        // Choose a random layout
-        if (RANDOM.nextBoolean()) {
-            frame.setLayout(new FlowLayout());
-        } else {
-            frame.setLayout(new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS));
-        }
-
-        // Add 2-5 random components
-        var componentCount = 2 + RANDOM.nextInt(7);
-        for (var i = 0; i < componentCount; i++) {
-            var generator = GENERATORS[RANDOM.nextInt(GENERATORS.length)];
-            var component = generator.generate();
-            component.setName(generator.getCategory());
-            frame.add(component);
-        }
     }
 
     private static void labelComponent(PrintWriter out, Component component, Component relativeTo, int imageId) {

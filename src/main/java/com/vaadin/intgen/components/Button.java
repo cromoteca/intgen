@@ -7,7 +7,7 @@ import javax.swing.JButton;
 public class Button implements ComponentGenerator {
 
     @Override
-    public JButton generate() {
+    public JButton _generate() {
         String buttonText;
 
         if (Intgen.RANDOM.nextBoolean()) {

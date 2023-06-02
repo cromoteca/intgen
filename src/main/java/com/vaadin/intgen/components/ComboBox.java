@@ -8,7 +8,7 @@ import javax.swing.JComboBox;
 public class ComboBox implements ComponentGenerator {
 
     @Override
-    public Component generate() {
+    public Component _generate() {
         return new JComboBox<>(new String[]{Intgen.words(1, 4)});
     }
 
