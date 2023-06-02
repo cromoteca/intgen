@@ -36,7 +36,7 @@ import javax.swing.plaf.metal.OceanTheme;
 public class Intgen {
 
     enum Phase {
-        TRAIN(200), VALID(20), TEST(20);
+        TRAIN(3000), VALID(200), TEST(200);
 
         private final int count;
 
@@ -56,6 +56,7 @@ public class Intgen {
             return new File(DATASET, name().toLowerCase() + "/labels");
         }
     }
+    public static final int IMAGE_SIZE = 640;
     public static final File DATASET = new File("C:\\Users\\Shadow\\datasets\\intgen");
 
     public static void main(String[] args) throws Exception {
@@ -127,12 +128,13 @@ public class Intgen {
 
             // Take a screenshot
             File image = new File(phase.getImages(), imageId + ".png");
-            saveScreenshot(image, imageId, frame);
+            Container contentPane = frame.getContentPane();
+            saveScreenshot(image, imageId, contentPane);
 
             // Print component details
             File labels = new File(phase.getLabels(), imageId + ".txt");
             try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(labels, false)))) {
-                printComponentDetails(out, frame, frame, imageId);
+                printComponentDetails(out, contentPane, contentPane, imageId);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -141,10 +143,10 @@ public class Intgen {
             latch.countDown();
         }
 
-        private void saveScreenshot(File file, int imageId, JFrame frame) {
+        private void saveScreenshot(File file, int imageId, Component frame) {
             try {
                 BufferedImage capturedImage = takeScreenshot(frame);
-                BufferedImage resizedImage = resizeImage(capturedImage, 512, 512);
+                BufferedImage resizedImage = resizeImage(capturedImage, IMAGE_SIZE, IMAGE_SIZE);
                 // Save as PNG
                 String fileName = "screenshot" + imageId + ".png";
                 ImageIO.write(resizedImage, "png", file);
@@ -159,6 +161,17 @@ public class Intgen {
             }
         }
 
+        public static BufferedImage takeScreenshot(Component component) {
+            BufferedImage image = new BufferedImage(
+                    component.getWidth(),
+                    component.getHeight(),
+                    BufferedImage.TYPE_INT_RGB);
+            // call the Component's paint method, using
+            // the Graphics object of the image.
+            component.paint(image.getGraphics()); // alternately use .printAll(..)
+            return image;
+        }
+    
         public static BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
             BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
             Graphics2D graphics2D = resizedImage.createGraphics();
@@ -168,10 +181,13 @@ public class Intgen {
         }
     }
 
-    public static final Random RANDOM = new Random();
+    public static final Random RANDOM = new Random(13579);
     public static final ComponentGenerator[] GENERATORS = new ComponentGenerator[]{
         new ButtonGenerator(),
-        new TextFieldWithTopLabelGenerator()
+        new TextFieldWithTopLabelGenerator(),
+        new TextFieldWithLeftLabelGenerator(),
+        new CheckboxGenerator(),
+        new ComboBoxGenerator()
     };
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -287,8 +303,8 @@ public class Intgen {
         Rectangle innerBounds = inner.getBounds();
 
         // calculate relative location
-        int relativeX = innerLocation.x - outerLocation.x;
-        int relativeY = innerLocation.y - outerLocation.y;
+        int relativeX = innerLocation.x - outerLocation.x + innerBounds.width / 2;
+        int relativeY = innerLocation.y - outerLocation.y + innerBounds.height / 2;
 
         return new Rectangle(relativeX, relativeY, innerBounds.width, innerBounds.height);
     }
@@ -311,16 +327,5 @@ public class Intgen {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public static BufferedImage takeScreenshot(Component component) {
-        BufferedImage image = new BufferedImage(
-                component.getWidth(),
-                component.getHeight(),
-                BufferedImage.TYPE_INT_RGB);
-        // call the Component's paint method, using
-        // the Graphics object of the image.
-        component.paint(image.getGraphics()); // alternately use .printAll(..)
-        return image;
     }
 }

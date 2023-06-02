@@ -7,7 +7,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class TextFieldWithTopLabelGenerator implements ComponentGenerator {
+public class TextFieldWithLeftLabelGenerator implements ComponentGenerator {
 
     private static final String[] LABEL_TEXTS = {"First name", "Last name", "Email", "City", "Country"};
 
@@ -19,7 +19,7 @@ public class TextFieldWithTopLabelGenerator implements ComponentGenerator {
         JTextField textField = new JTextField();
         textField.setPreferredSize(new Dimension(100, textField.getPreferredSize().height));
 
-        panel.add(label, BorderLayout.NORTH);
+        panel.add(label, BorderLayout.WEST);
         panel.add(textField, BorderLayout.CENTER);
 
         return panel;
@@ -27,7 +27,7 @@ public class TextFieldWithTopLabelGenerator implements ComponentGenerator {
 
     @Override
     public String getCategory() {
-        return "TextFieldWithTopLabel";
+        return "TextFieldWithLeftLabel";
     }
 
 }
