@@ -9,6 +9,7 @@ import java.util.List;
 import javax.swing.JComboBox;
 
 public class ComboBoxGenerator implements ComponentGenerator {
+
     private static final String[] LABELS = {
         "Male",
         "Female",
@@ -21,10 +22,10 @@ public class ComboBoxGenerator implements ComponentGenerator {
         "Red",
         "Blue"
     };
-    
+
     @Override
     public Component generate() {
-        List<String> some = new ArrayList<>(Arrays.stream(LABELS).filter(s->Intgen.RANDOM.nextBoolean()).toList());
+        List<String> some = new ArrayList<>(Arrays.stream(LABELS).filter(s -> Intgen.RANDOM.nextBoolean()).toList());
         Collections.shuffle(some, Intgen.RANDOM);
         return new JComboBox<>(some.toArray(String[]::new));
     }
@@ -33,5 +34,5 @@ public class ComboBoxGenerator implements ComponentGenerator {
     public String getCategory() {
         return "ComboBox";
     }
-    
+
 }

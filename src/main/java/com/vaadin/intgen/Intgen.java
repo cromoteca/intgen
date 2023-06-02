@@ -171,7 +171,7 @@ public class Intgen {
             component.paint(image.getGraphics()); // alternately use .printAll(..)
             return image;
         }
-    
+
         public static BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
             BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
             Graphics2D graphics2D = resizedImage.createGraphics();

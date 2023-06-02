@@ -18,7 +18,6 @@ public class CheckboxGenerator implements ComponentGenerator {
         "Participate in surveys",
         "Opt-in for marketing communications"
     };
-    
 
     @Override
     public Component generate() {
@@ -30,5 +29,5 @@ public class CheckboxGenerator implements ComponentGenerator {
     public String getCategory() {
         return "Checkbox";
     }
-    
+
 }
