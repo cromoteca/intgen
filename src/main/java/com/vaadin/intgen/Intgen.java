@@ -15,6 +15,7 @@ import com.vaadin.intgen.components.TextFieldWithTopLabel;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
+import java.awt.HeadlessException;
 import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -64,22 +65,26 @@ public class Intgen {
     public static final File DATASET = new File("target/dataset");
 
     public static void main(String[] args) throws Exception {
-
         for (var lookAndFeel : lookAndFeels) {
             System.out.println(lookAndFeel.getName());
         }
+
         for (var phase : Phase.values()) {
             phase.getImages().mkdirs();
             phase.getLabels().mkdirs();
 
             for (var i = 0; i < phase.getCount(); i++) {
-                makeOne(phase, i);
+                var latch = new CountDownLatch(1);
+                createAndShowGui(phase, latch, i); // pass the latch and image id to the method
+                latch.await(); // wait for the latch to count down to 0 before continuing
             }
         }
+
         var names = Arrays.stream(GENERATORS)
                 .map(ComponentGenerator::getCategory)
                 .map(cat -> "'" + cat + "'")
                 .collect(Collectors.joining(", "));
+
         var yaml = new File(DATASET, "data.yaml");
         try (var out = new PrintWriter(new BufferedWriter(new FileWriter(yaml, false)))) {
             out.println("train: ../train/images");
@@ -88,23 +93,7 @@ public class Intgen {
             out.println();
             out.println("nc: " + GENERATORS.length);
             out.println("names: [" + names + "]");
-        } catch (IOException ex) {
-            ex.printStackTrace();
         }
-    }
-
-    private static void makeOne(Phase phase, int i) throws InterruptedException {
-        var latch = new CountDownLatch(1);
-
-        SwingUtilities.invokeLater(() -> {
-            try {
-                createAndShowGui(phase, latch, i); // pass the latch and image id to the method
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
-        latch.await(); // wait for the latch to count down to 0 before continuing
     }
 
     private static final class WindowAdapterExtension extends WindowAdapter {
@@ -125,36 +114,30 @@ public class Intgen {
         public void windowOpened(WindowEvent e) {
             super.windowOpened(e);
 
-            // Take a screenshot
-            var image = new File(phase.getImages(), imageId + ".png");
             var contentPane = frame.getContentPane();
-            takeScreenshot(image, contentPane);
+            var imageFile = new File(phase.getImages(), imageId + ".png");
+            var labelFile = new File(phase.getLabels(), imageId + ".txt");
 
-            // Print component details
-            var labels = new File(phase.getLabels(), imageId + ".txt");
-            try (var out = new PrintWriter(new BufferedWriter(new FileWriter(labels, false)))) {
+            try (var out = new PrintWriter(new BufferedWriter(new FileWriter(labelFile, false)))) {
+                takeScreenshot(imageFile, contentPane);
                 labelComponent(out, contentPane, contentPane, imageId);
             } catch (IOException ex) {
-                ex.printStackTrace();
+                throw new RuntimeException(ex);
             }
 
             frame.dispose();
             latch.countDown();
         }
 
-        private void takeScreenshot(File file, Component frame) {
-            try {
-                var image = new BufferedImage(frame.getWidth(), frame.getHeight(), BufferedImage.TYPE_INT_RGB);
-                // call the Component's paint method, using
-                // the Graphics object of the image.
-                frame.paint(image.getGraphics());
-                var capturedImage = image;
-                var resizedImage = resizeImage(capturedImage, IMAGE_SIZE, IMAGE_SIZE);
-                // Save as PNG
-                ImageIO.write(resizedImage, "png", file);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+        private void takeScreenshot(File file, Component frame) throws IOException {
+            var image = new BufferedImage(frame.getWidth(), frame.getHeight(), BufferedImage.TYPE_INT_RGB);
+            // call the Component's paint method, using
+            // the Graphics object of the image.
+            frame.paint(image.getGraphics());
+            var capturedImage = image;
+            var resizedImage = resizeImage(capturedImage, IMAGE_SIZE, IMAGE_SIZE);
+            // Save as PNG
+            ImageIO.write(resizedImage, "png", file);
         }
 
         public static BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
@@ -195,7 +178,6 @@ public class Intgen {
     private static void createAndShowGui(Phase phase, CountDownLatch latch, int imageId) {
         SwingUtilities.invokeLater(() -> {
             try {
-
                 // Choose a random look and feel
                 var lookAndFeelClassName = lookAndFeels[RANDOM.nextInt(lookAndFeels.length)].getClassName();
                 UIManager.setLookAndFeel(lookAndFeelClassName);
@@ -222,8 +204,8 @@ public class Intgen {
                 frame.pack();
                 frame.setLocationRelativeTo(null);
                 frame.setVisible(true);
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (HeadlessException | ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
+                throw new RuntimeException(e);
             }
         });
     }
