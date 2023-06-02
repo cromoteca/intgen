@@ -1,8 +1,5 @@
 package com.vaadin.intgen;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
@@ -29,7 +26,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
@@ -95,8 +91,6 @@ public class Intgen {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
-
-        objectMapper.writeValue(new File(DATASET, "_annotations.coco.json"), rootNode);
     }
 
     private static void makeOne(Phase phase, int i) throws InterruptedException {
@@ -153,14 +147,7 @@ public class Intgen {
                 var capturedImage = takeScreenshot(frame);
                 var resizedImage = resizeImage(capturedImage, IMAGE_SIZE, IMAGE_SIZE);
                 // Save as PNG
-                var fileName = "screenshot" + imageId + ".png";
                 ImageIO.write(resizedImage, "png", file);
-
-                var imageNode = images.addObject();
-                imageNode.put("id", imageId);
-                imageNode.put("width", capturedImage.getWidth());
-                imageNode.put("height", capturedImage.getHeight());
-                imageNode.put("file_name", fileName);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -196,15 +183,9 @@ public class Intgen {
         new TextAreaWithTopLabel()
     };
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-
     // Get the available look and feels
     private static final UIManager.LookAndFeelInfo[] lookAndFeels;
 
-    private static final ObjectNode rootNode = objectMapper.createObjectNode();
-    private static final ArrayNode images = rootNode.putArray("images");
-    private static final ArrayNode annotations = rootNode.putArray("annotations");
-    private static final ArrayNode categories = rootNode.putArray("categories");
     private static final Map<String, Integer> categoryMap = new HashMap<>();
 
     static {
@@ -215,10 +196,6 @@ public class Intgen {
         for (var i = 0; i < GENERATORS.length; i++) {
             var generator = GENERATORS[i];
             categoryMap.put(generator.getCategory(), i);
-            var categoryNode = categories.addObject();
-            categoryNode.put("supercategory", "Boxes");
-            categoryNode.put("id", i);
-            categoryNode.put("name", generator.getCategory());
         }
     }
 
@@ -276,27 +253,10 @@ public class Intgen {
         }
     }
 
-    private static int idCounter = 0;
-
     private static void printComponentDetails(PrintWriter out, Component component, Component relativeTo, int imageId) {
         var categoryId = categoryMap.get(component.getName());
 
         if (categoryId != null) {
-            var position = SwingUtilities.convertPoint(component, 0, 0, relativeTo);
-            var size = component.getSize();
-            float area = size.width * size.height;
-
-            var componentDetails = annotations.addObject();
-            componentDetails.put("image_id", imageId);
-            componentDetails.put("id", idCounter++);
-            var bbox = componentDetails.putArray("bbox");
-            bbox.add(position.x);
-            bbox.add(position.y);
-            bbox.add(size.width);
-            bbox.add(size.height);
-            componentDetails.put("area", area);
-            componentDetails.put("category_id", categoryId);
-
             addLine(component, relativeTo, categoryId, out);
         }
 
@@ -327,13 +287,5 @@ public class Intgen {
         var h = bounds.getHeight() / outer.getHeight();
 
         out.println(categoryId + " " + x + " " + y + " " + w + " " + h);
-    }
-
-    public static void writeJsonToFile(List<ObjectNode> componentDetailsList, String filePath) {
-        try {
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(new File(filePath), componentDetailsList);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }
