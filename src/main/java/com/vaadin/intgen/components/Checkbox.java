@@ -23,7 +23,7 @@ public class Checkbox implements ComponentGenerator {
 
     @Override
     public Component generate() {
-        String text = LABELS[Intgen.RANDOM.nextInt(LABELS.length)];
+        var text = LABELS[Intgen.RANDOM.nextInt(LABELS.length)];
         return new JCheckBox(text, Intgen.RANDOM.nextBoolean());
     }
 

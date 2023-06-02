@@ -12,10 +12,9 @@ public class TextAreaWithTopLabel implements ComponentGenerator {
 
     @Override
     public Component generate() {
-        JPanel panel = new JPanel(new BorderLayout());
-
-        JLabel label = new JLabel("LABEL");
-        JTextArea textArea = new JTextArea();
+        var panel = new JPanel(new BorderLayout());
+        var label = new JLabel("LABEL");
+        var textArea = new JTextArea();
         textArea.setPreferredSize(new Dimension(400, 200));
 
         panel.add(label, BorderLayout.NORTH);

@@ -10,8 +10,8 @@ public class Button implements ComponentGenerator {
 
     @Override
     public JButton generate() {
-        String buttonText = BUTTON_TEXTS[Intgen.RANDOM.nextInt(BUTTON_TEXTS.length)];
-        JButton button = new JButton(buttonText);
+        var buttonText = BUTTON_TEXTS[Intgen.RANDOM.nextInt(BUTTON_TEXTS.length)];
+        var button = new JButton(buttonText);
         return button;
     }
 

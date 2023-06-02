@@ -6,7 +6,6 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import javax.swing.JComboBox;
 
@@ -27,7 +26,7 @@ public class ComboBox implements ComponentGenerator {
 
     @Override
     public Component generate() {
-        List<String> some = new ArrayList<>(Arrays.stream(LABELS).filter(s -> Intgen.RANDOM.nextBoolean()).toList());
+        var some = new ArrayList<>(Arrays.stream(LABELS).filter(s -> Intgen.RANDOM.nextBoolean()).toList());
         Collections.shuffle(some, Intgen.RANDOM);
         return new JComboBox<>(some.toArray(String[]::new));
     }

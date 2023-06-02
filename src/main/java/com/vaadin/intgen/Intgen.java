@@ -1,11 +1,5 @@
 package com.vaadin.intgen;
 
-import com.vaadin.intgen.components.ComboBox;
-import com.vaadin.intgen.components.Button;
-import com.vaadin.intgen.components.Checkbox;
-import com.vaadin.intgen.components.TextAreaWithTopLabel;
-import com.vaadin.intgen.components.TextFieldWithTopLabel;
-import com.vaadin.intgen.components.TextFieldWithLeftLabel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -15,12 +9,15 @@ import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
+import com.vaadin.intgen.components.Button;
+import com.vaadin.intgen.components.Checkbox;
+import com.vaadin.intgen.components.ComboBox;
+import com.vaadin.intgen.components.TextAreaWithTopLabel;
+import com.vaadin.intgen.components.TextFieldWithLeftLabel;
+import com.vaadin.intgen.components.TextFieldWithTopLabel;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -72,26 +69,23 @@ public class Intgen {
 
     public static void main(String[] args) throws Exception {
 
-        for (UIManager.LookAndFeelInfo lookAndFeel : lookAndFeels) {
+        for (var lookAndFeel : lookAndFeels) {
             System.out.println(lookAndFeel.getName());
         }
-
-        for (Phase phase : Phase.values()) {
+        for (var phase : Phase.values()) {
             phase.getImages().mkdirs();
             phase.getLabels().mkdirs();
 
-            for (int i = 0; i < phase.getCount(); i++) {
+            for (var i = 0; i < phase.getCount(); i++) {
                 makeOne(phase, i);
             }
         }
-
-        String names = Arrays.stream(GENERATORS)
+        var names = Arrays.stream(GENERATORS)
                 .map(ComponentGenerator::getCategory)
                 .map(cat -> "'" + cat + "'")
                 .collect(Collectors.joining(", "));
-
-        File yaml = new File(DATASET, "data.yaml");
-        try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(yaml, false)))) {
+        var yaml = new File(DATASET, "data.yaml");
+        try (var out = new PrintWriter(new BufferedWriter(new FileWriter(yaml, false)))) {
             out.println("train: ../train/images");
             out.println("val: ../valid/images");
             out.println("test: ../test/images");
@@ -106,7 +100,7 @@ public class Intgen {
     }
 
     private static void makeOne(Phase phase, int i) throws InterruptedException {
-        CountDownLatch latch = new CountDownLatch(1);
+        var latch = new CountDownLatch(1);
 
         SwingUtilities.invokeLater(() -> {
             try {
@@ -138,13 +132,13 @@ public class Intgen {
             super.windowOpened(e);
 
             // Take a screenshot
-            File image = new File(phase.getImages(), imageId + ".png");
-            Container contentPane = frame.getContentPane();
+            var image = new File(phase.getImages(), imageId + ".png");
+            var contentPane = frame.getContentPane();
             saveScreenshot(image, imageId, contentPane);
 
             // Print component details
-            File labels = new File(phase.getLabels(), imageId + ".txt");
-            try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(labels, false)))) {
+            var labels = new File(phase.getLabels(), imageId + ".txt");
+            try (var out = new PrintWriter(new BufferedWriter(new FileWriter(labels, false)))) {
                 printComponentDetails(out, contentPane, contentPane, imageId);
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -156,13 +150,13 @@ public class Intgen {
 
         private void saveScreenshot(File file, int imageId, Component frame) {
             try {
-                BufferedImage capturedImage = takeScreenshot(frame);
-                BufferedImage resizedImage = resizeImage(capturedImage, IMAGE_SIZE, IMAGE_SIZE);
+                var capturedImage = takeScreenshot(frame);
+                var resizedImage = resizeImage(capturedImage, IMAGE_SIZE, IMAGE_SIZE);
                 // Save as PNG
-                String fileName = "screenshot" + imageId + ".png";
+                var fileName = "screenshot" + imageId + ".png";
                 ImageIO.write(resizedImage, "png", file);
 
-                ObjectNode imageNode = images.addObject();
+                var imageNode = images.addObject();
                 imageNode.put("id", imageId);
                 imageNode.put("width", capturedImage.getWidth());
                 imageNode.put("height", capturedImage.getHeight());
@@ -173,19 +167,19 @@ public class Intgen {
         }
 
         public static BufferedImage takeScreenshot(Component component) {
-            BufferedImage image = new BufferedImage(
+            var image = new BufferedImage(
                     component.getWidth(),
                     component.getHeight(),
                     BufferedImage.TYPE_INT_RGB);
             // call the Component's paint method, using
             // the Graphics object of the image.
-            component.paint(image.getGraphics()); // alternately use .printAll(..)
+            component.paint(image.getGraphics());
             return image;
         }
 
         public static BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
-            BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
-            Graphics2D graphics2D = resizedImage.createGraphics();
+            var resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+            var graphics2D = resizedImage.createGraphics();
             graphics2D.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
             graphics2D.dispose();
             return resizedImage;
@@ -218,10 +212,10 @@ public class Intgen {
             UIManager.installLookAndFeel(laf.getSimpleName(), laf.getName());
         });
         lookAndFeels = UIManager.getInstalledLookAndFeels();
-        for (int i = 0; i < GENERATORS.length; i++) {
-            ComponentGenerator generator = GENERATORS[i];
+        for (var i = 0; i < GENERATORS.length; i++) {
+            var generator = GENERATORS[i];
             categoryMap.put(generator.getCategory(), i);
-            ObjectNode categoryNode = categories.addObject();
+            var categoryNode = categories.addObject();
             categoryNode.put("supercategory", "Boxes");
             categoryNode.put("id", i);
             categoryNode.put("name", generator.getCategory());
@@ -233,7 +227,7 @@ public class Intgen {
             try {
 
                 // Choose a random look and feel
-                String lookAndFeelClassName = lookAndFeels[RANDOM.nextInt(lookAndFeels.length)].getClassName();
+                var lookAndFeelClassName = lookAndFeels[RANDOM.nextInt(lookAndFeels.length)].getClassName();
                 UIManager.setLookAndFeel(lookAndFeelClassName);
 
                 // If the L&F is Metal, set a random theme
@@ -246,7 +240,7 @@ public class Intgen {
                 }
 
                 // Create the frame
-                JFrame frame = new JFrame("Random Swing App");
+                var frame = new JFrame("Random Swing App");
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
                 // Add a WindowListener to wait for the windowOpened event
@@ -273,10 +267,10 @@ public class Intgen {
         }
 
         // Add 2-5 random components
-        int componentCount = 2 + RANDOM.nextInt(7);
-        for (int i = 0; i < componentCount; i++) {
-            ComponentGenerator generator = GENERATORS[RANDOM.nextInt(GENERATORS.length)];
-            Component component = generator.generate();
+        var componentCount = 2 + RANDOM.nextInt(7);
+        for (var i = 0; i < componentCount; i++) {
+            var generator = GENERATORS[RANDOM.nextInt(GENERATORS.length)];
+            var component = generator.generate();
             component.setName(generator.getCategory());
             frame.add(component);
         }
@@ -285,17 +279,17 @@ public class Intgen {
     private static int idCounter = 0;
 
     private static void printComponentDetails(PrintWriter out, Component component, Component relativeTo, int imageId) {
-        Integer categoryId = categoryMap.get(component.getName());
+        var categoryId = categoryMap.get(component.getName());
 
         if (categoryId != null) {
-            Point position = SwingUtilities.convertPoint(component, 0, 0, relativeTo);
-            Dimension size = component.getSize();
+            var position = SwingUtilities.convertPoint(component, 0, 0, relativeTo);
+            var size = component.getSize();
             float area = size.width * size.height;
 
-            ObjectNode componentDetails = annotations.addObject();
+            var componentDetails = annotations.addObject();
             componentDetails.put("image_id", imageId);
             componentDetails.put("id", idCounter++);
-            ArrayNode bbox = componentDetails.putArray("bbox");
+            var bbox = componentDetails.putArray("bbox");
             bbox.add(position.x);
             bbox.add(position.y);
             bbox.add(size.width);
@@ -307,32 +301,30 @@ public class Intgen {
         }
 
         if (component instanceof Container container) {
-            for (Component child : container.getComponents()) {
+            for (var child : container.getComponents()) {
                 printComponentDetails(out, child, relativeTo, imageId);
             }
         }
     }
 
     public static Rectangle getRelativeBounds(Component inner, Component outer) {
-        Point innerLocation = inner.getLocationOnScreen();
-        Point outerLocation = outer.getLocationOnScreen();
-        Rectangle innerBounds = inner.getBounds();
-
+        var innerLocation = inner.getLocationOnScreen();
+        var outerLocation = outer.getLocationOnScreen();
+        var innerBounds = inner.getBounds();
         // calculate relative location
-        int relativeX = innerLocation.x - outerLocation.x + innerBounds.width / 2;
-        int relativeY = innerLocation.y - outerLocation.y + innerBounds.height / 2;
+        var relativeX = innerLocation.x - outerLocation.x + innerBounds.width / 2;
+        var relativeY = innerLocation.y - outerLocation.y + innerBounds.height / 2;
 
         return new Rectangle(relativeX, relativeY, innerBounds.width, innerBounds.height);
     }
 
     public static void addLine(Component inner, Component outer, int categoryId, PrintWriter out) {
-        Rectangle bounds = getRelativeBounds(inner, outer);
-
+        var bounds = getRelativeBounds(inner, outer);
         // normalize coordinates and size to be between 0 and 1
-        double x = bounds.getX() / outer.getWidth();
-        double y = bounds.getY() / outer.getHeight();
-        double w = bounds.getWidth() / outer.getWidth();
-        double h = bounds.getHeight() / outer.getHeight();
+        var x = bounds.getX() / outer.getWidth();
+        var y = bounds.getY() / outer.getHeight();
+        var w = bounds.getWidth() / outer.getWidth();
+        var h = bounds.getHeight() / outer.getHeight();
 
         out.println(categoryId + " " + x + " " + y + " " + w + " " + h);
     }
