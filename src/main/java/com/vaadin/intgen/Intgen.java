@@ -1,5 +1,11 @@
 package com.vaadin.intgen;
 
+import com.vaadin.intgen.components.ComboBox;
+import com.vaadin.intgen.components.Button;
+import com.vaadin.intgen.components.Checkbox;
+import com.vaadin.intgen.components.TextAreaWithTopLabel;
+import com.vaadin.intgen.components.TextFieldWithTopLabel;
+import com.vaadin.intgen.components.TextFieldWithLeftLabel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -188,12 +194,12 @@ public class Intgen {
 
     public static final Random RANDOM = new Random(13579);
     public static final ComponentGenerator[] GENERATORS = new ComponentGenerator[]{
-        new ButtonGenerator(),
-        new TextFieldWithTopLabelGenerator(),
-        new TextFieldWithLeftLabelGenerator(),
-        new CheckboxGenerator(),
-        new ComboBoxGenerator(),
-        new TextAreaWithTopLabelGenerator()
+        new Button(),
+        new TextFieldWithTopLabel(),
+        new TextFieldWithLeftLabel(),
+        new Checkbox(),
+        new ComboBox(),
+        new TextAreaWithTopLabel()
     };
 
     private static final ObjectMapper objectMapper = new ObjectMapper();

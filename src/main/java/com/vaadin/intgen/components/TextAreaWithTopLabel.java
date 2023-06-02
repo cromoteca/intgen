@@ -1,5 +1,6 @@
-package com.vaadin.intgen;
+package com.vaadin.intgen.components;
 
+import com.vaadin.intgen.ComponentGenerator;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -7,7 +8,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
-public class TextAreaWithTopLabelGenerator implements ComponentGenerator {
+public class TextAreaWithTopLabel implements ComponentGenerator {
 
     @Override
     public Component generate() {

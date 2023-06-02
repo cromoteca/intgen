@@ -1,5 +1,7 @@
-package com.vaadin.intgen;
+package com.vaadin.intgen.components;
 
+import com.vaadin.intgen.ComponentGenerator;
+import com.vaadin.intgen.Intgen;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,7 +10,7 @@ import java.util.List;
 
 import javax.swing.JComboBox;
 
-public class ComboBoxGenerator implements ComponentGenerator {
+public class ComboBox implements ComponentGenerator {
 
     private static final String[] LABELS = {
         "Male",

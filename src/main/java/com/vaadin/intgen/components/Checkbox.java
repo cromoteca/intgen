@@ -1,10 +1,12 @@
-package com.vaadin.intgen;
+package com.vaadin.intgen.components;
 
+import com.vaadin.intgen.ComponentGenerator;
+import com.vaadin.intgen.Intgen;
 import java.awt.Component;
 
 import javax.swing.JCheckBox;
 
-public class CheckboxGenerator implements ComponentGenerator {
+public class Checkbox implements ComponentGenerator {
 
     private static final String[] LABELS = {
         "I agree to the terms and conditions",
