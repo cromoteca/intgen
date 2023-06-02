@@ -3,6 +3,12 @@ package com.vaadin.intgen;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.formdev.flatlaf.FlatDarculaLaf;
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatIntelliJLaf;
+import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.themes.FlatMacDarkLaf;
+import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -10,8 +16,6 @@ import java.awt.FlowLayout;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-
-import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -27,8 +31,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
-
+import java.util.stream.Stream;
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import javax.swing.plaf.metal.DefaultMetalTheme;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import javax.swing.plaf.metal.OceanTheme;
@@ -36,7 +41,7 @@ import javax.swing.plaf.metal.OceanTheme;
 public class Intgen {
 
     enum Phase {
-        TRAIN(3000), VALID(200), TEST(200);
+        TRAIN(30), VALID(2), TEST(2);
 
         private final int count;
 
@@ -57,7 +62,7 @@ public class Intgen {
         }
     }
     public static final int IMAGE_SIZE = 640;
-    public static final File DATASET = new File("C:\\Users\\Shadow\\datasets\\intgen");
+    public static final File DATASET = new File("target/dataset");
 
     public static void main(String[] args) throws Exception {
 
@@ -187,13 +192,14 @@ public class Intgen {
         new TextFieldWithTopLabelGenerator(),
         new TextFieldWithLeftLabelGenerator(),
         new CheckboxGenerator(),
-        new ComboBoxGenerator()
+        new ComboBoxGenerator(),
+        new TextAreaWithTopLabelGenerator()
     };
 
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     // Get the available look and feels
-    private static final UIManager.LookAndFeelInfo[] lookAndFeels = UIManager.getInstalledLookAndFeels();
+    private static final UIManager.LookAndFeelInfo[] lookAndFeels;
 
     private static final ObjectNode rootNode = objectMapper.createObjectNode();
     private static final ArrayNode images = rootNode.putArray("images");
@@ -202,6 +208,10 @@ public class Intgen {
     private static final Map<String, Integer> categoryMap = new HashMap<>();
 
     static {
+        Stream.of(FlatDarculaLaf.class, FlatDarkLaf.class, FlatIntelliJLaf.class, FlatLightLaf.class, FlatMacLightLaf.class, FlatMacDarkLaf.class).forEach(laf -> {
+            UIManager.installLookAndFeel(laf.getSimpleName(), laf.getName());
+        });
+        lookAndFeels = UIManager.getInstalledLookAndFeels();
         for (int i = 0; i < GENERATORS.length; i++) {
             ComponentGenerator generator = GENERATORS[i];
             categoryMap.put(generator.getCategory(), i);
