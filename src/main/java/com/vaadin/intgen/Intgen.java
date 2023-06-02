@@ -128,12 +128,12 @@ public class Intgen {
             // Take a screenshot
             var image = new File(phase.getImages(), imageId + ".png");
             var contentPane = frame.getContentPane();
-            saveScreenshot(image, imageId, contentPane);
+            takeScreenshot(image, contentPane);
 
             // Print component details
             var labels = new File(phase.getLabels(), imageId + ".txt");
             try (var out = new PrintWriter(new BufferedWriter(new FileWriter(labels, false)))) {
-                printComponentDetails(out, contentPane, contentPane, imageId);
+                labelComponent(out, contentPane, contentPane, imageId);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -142,26 +142,19 @@ public class Intgen {
             latch.countDown();
         }
 
-        private void saveScreenshot(File file, int imageId, Component frame) {
+        private void takeScreenshot(File file, Component frame) {
             try {
-                var capturedImage = takeScreenshot(frame);
+                var image = new BufferedImage(frame.getWidth(), frame.getHeight(), BufferedImage.TYPE_INT_RGB);
+                // call the Component's paint method, using
+                // the Graphics object of the image.
+                frame.paint(image.getGraphics());
+                var capturedImage = image;
                 var resizedImage = resizeImage(capturedImage, IMAGE_SIZE, IMAGE_SIZE);
                 // Save as PNG
                 ImageIO.write(resizedImage, "png", file);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-        }
-
-        public static BufferedImage takeScreenshot(Component component) {
-            var image = new BufferedImage(
-                    component.getWidth(),
-                    component.getHeight(),
-                    BufferedImage.TYPE_INT_RGB);
-            // call the Component's paint method, using
-            // the Graphics object of the image.
-            component.paint(image.getGraphics());
-            return image;
         }
 
         public static BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
@@ -253,16 +246,22 @@ public class Intgen {
         }
     }
 
-    private static void printComponentDetails(PrintWriter out, Component component, Component relativeTo, int imageId) {
+    private static void labelComponent(PrintWriter out, Component component, Component relativeTo, int imageId) {
         var categoryId = categoryMap.get(component.getName());
 
         if (categoryId != null) {
-            addLine(component, relativeTo, categoryId, out);
+            var bounds = getRelativeBounds(component, relativeTo);
+            // normalize coordinates and size to be between 0 and 1
+            var x = bounds.getX() / relativeTo.getWidth();
+            var y = bounds.getY() / relativeTo.getHeight();
+            var w = bounds.getWidth() / relativeTo.getWidth();
+            var h = bounds.getHeight() / relativeTo.getHeight();
+            out.println(categoryId + " " + x + " " + y + " " + w + " " + h);
         }
 
         if (component instanceof Container container) {
             for (var child : container.getComponents()) {
-                printComponentDetails(out, child, relativeTo, imageId);
+                labelComponent(out, child, relativeTo, imageId);
             }
         }
     }
@@ -278,14 +277,4 @@ public class Intgen {
         return new Rectangle(relativeX, relativeY, innerBounds.width, innerBounds.height);
     }
 
-    public static void addLine(Component inner, Component outer, int categoryId, PrintWriter out) {
-        var bounds = getRelativeBounds(inner, outer);
-        // normalize coordinates and size to be between 0 and 1
-        var x = bounds.getX() / outer.getWidth();
-        var y = bounds.getY() / outer.getHeight();
-        var w = bounds.getWidth() / outer.getWidth();
-        var h = bounds.getHeight() / outer.getHeight();
-
-        out.println(categoryId + " " + x + " " + y + " " + w + " " + h);
-    }
 }
