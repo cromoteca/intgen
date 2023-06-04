@@ -4,6 +4,7 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.IntelliJTheme;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import com.vaadin.intgen.components.Button;
@@ -44,10 +45,11 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.plaf.metal.DefaultMetalTheme;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-import javax.swing.plaf.metal.OceanTheme;
+import javax.swing.BoxLayout;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 
 public class Intgen {
 
@@ -272,15 +274,11 @@ public class Intgen {
 
     private static void createAndShowGui(Phase phase, CountDownLatch latch, int imageId) {
         try {
-            var lookAndFeelClassName = lookAndFeels[RANDOM.nextInt(lookAndFeels.length)].getClassName();
-            UIManager.setLookAndFeel(lookAndFeelClassName);
-
-            if (lookAndFeelClassName.equals("javax.swing.plaf.metal.MetalLookAndFeel")) {
-                if (RANDOM.nextBoolean()) {
-                    MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
-                } else {
-                    MetalLookAndFeel.setCurrentTheme(new OceanTheme());
-                }
+            if (RANDOM.nextBoolean()) {
+                var lookAndFeelClassName = lookAndFeels[RANDOM.nextInt(lookAndFeels.length)].getClassName();
+                UIManager.setLookAndFeel(lookAndFeelClassName);
+            } else {
+                IntelliJTheme.setup(Intgen.class.getResourceAsStream("/GitHub.theme.json"));
             }
 
             var frame = new JFrame("Random Swing App");
