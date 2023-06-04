@@ -4,10 +4,10 @@ import com.vaadin.intgen.ComponentGenerator;
 import com.vaadin.intgen.Intgen;
 import javax.swing.JButton;
 
-public class Button implements ComponentGenerator {
+public class Button implements ComponentGenerator<JButton> {
 
     @Override
-    public JButton _generate() {
+    public JButton generate() {
         String buttonText;
 
         if (Intgen.RANDOM.nextBoolean()) {

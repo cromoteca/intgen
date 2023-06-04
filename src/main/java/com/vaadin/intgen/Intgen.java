@@ -13,9 +13,11 @@ import com.vaadin.intgen.components.TextAreaWithTopLabel;
 import com.vaadin.intgen.components.TextFieldWithLeftLabel;
 import com.vaadin.intgen.components.TextFieldWithTopLabel;
 import com.vaadin.intgen.layouts.HorizontalLayout;
+import com.vaadin.intgen.layouts.TabLayout;
 import com.vaadin.intgen.layouts.VerticalLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.GraphicsEnvironment;
 import java.awt.HeadlessException;
 import java.awt.Rectangle;
 import java.awt.event.WindowAdapter;
@@ -23,6 +25,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -30,10 +33,10 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
@@ -47,8 +50,60 @@ import javax.swing.plaf.metal.OceanTheme;
 
 public class Intgen {
 
+    public static void main(String[] args) throws Exception {
+        for (var lookAndFeel : lookAndFeels) {
+            System.out.println(lookAndFeel.getName());
+        }
+
+        for (var phase : Phase.values()) {
+            phase.getImages().mkdirs();
+            phase.getLabels().mkdirs();
+
+            for (var i = 0; i < phase.getCount(); i++) {
+                var latch = new CountDownLatch(1);
+                var imageId = i;
+
+                SwingUtilities.invokeLater(() -> {
+                    createAndShowGui(phase, latch, imageId); // pass the latch and image id to the method
+                });
+
+                latch.await(); // wait for the latch to count down to 0 before continuing
+            }
+        }
+
+        var names = ALL.stream()
+                .map(ComponentGenerator::getCategory)
+                .map(cat -> "'" + cat + "'")
+                .collect(Collectors.joining(", "));
+
+        var yaml = new File(DATASET, "data.yaml");
+        try (var out = new PrintWriter(new BufferedWriter(new FileWriter(yaml, false)))) {
+            out.println("train: ../train/images");
+            out.println("val: ../valid/images");
+            out.println("test: ../test/images");
+            out.println();
+            out.println("nc: " + ALL.size());
+            out.println("names: [" + names + "]");
+        }
+    }
+    static final Properties config = new Properties();
+
+    static {
+        try (var reader = new FileReader(new File(System.getProperty("user.dir"), "intgen.properties"))) {
+            config.load(reader);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    static int intConfigParam(String key) {
+        return Integer.parseInt(config.getProperty(key));
+    }
+
     enum Phase {
-        TRAIN(30), VALID(2), TEST(2);
+        TRAIN(intConfigParam("train")),
+        VALID(intConfigParam("valid")),
+        TEST(intConfigParam("test"));
 
         private final int count;
 
@@ -68,40 +123,8 @@ public class Intgen {
             return new File(DATASET, name().toLowerCase() + "/labels");
         }
     }
-    public static final int IMAGE_SIZE = 1024;
-    public static final File DATASET = new File("target/dataset");
-
-    public static void main(String[] args) throws Exception {
-        for (var lookAndFeel : lookAndFeels) {
-            System.out.println(lookAndFeel.getName());
-        }
-
-        for (var phase : Phase.values()) {
-            phase.getImages().mkdirs();
-            phase.getLabels().mkdirs();
-
-            for (var i = 0; i < phase.getCount(); i++) {
-                var latch = new CountDownLatch(1);
-                createAndShowGui(phase, latch, i); // pass the latch and image id to the method
-                latch.await(); // wait for the latch to count down to 0 before continuing
-            }
-        }
-
-        var names = Stream.concat(Arrays.stream(LAYOUTS), Arrays.stream(COMPONENTS))
-                .map(ComponentGenerator::getCategory)
-                .map(cat -> "'" + cat + "'")
-                .collect(Collectors.joining(", "));
-
-        var yaml = new File(DATASET, "data.yaml");
-        try (var out = new PrintWriter(new BufferedWriter(new FileWriter(yaml, false)))) {
-            out.println("train: ../train/images");
-            out.println("val: ../valid/images");
-            out.println("test: ../test/images");
-            out.println();
-            out.println("nc: " + (LAYOUTS.length + COMPONENTS.length));
-            out.println("names: [" + names + "]");
-        }
-    }
+    public static final int IMAGE_SIZE = intConfigParam("imageSize");
+    public static final File DATASET = new File(config.getProperty("datasetLocation"));
 
     private static final class WindowAdapterExtension extends WindowAdapter {
 
@@ -139,7 +162,7 @@ public class Intgen {
         private void takeScreenshot(File file, Component frame) throws IOException {
             var image = new BufferedImage(frame.getWidth(), frame.getHeight(), BufferedImage.TYPE_INT_RGB);
             // call the Component's paint method, using
-            // the Graphics object of the image.
+            // the Graphics object l the image.
             frame.paint(image.getGraphics());
             var capturedImage = image;
             var resizedImage = resizeImage(capturedImage, IMAGE_SIZE, IMAGE_SIZE);
@@ -156,32 +179,36 @@ public class Intgen {
         }
     }
 
-    public static final Random RANDOM = new Random(13579);
-    public static final ComponentGenerator[] COMPONENTS = new ComponentGenerator[]{
-        new Button(),
-        new TextFieldWithTopLabel(),
-        new TextFieldWithLeftLabel(),
-        new Checkbox(),
-        new ComboBox(),
-        new TextAreaWithTopLabel()
-    };
-    public static final LayoutGenerator[] LAYOUTS = new LayoutGenerator[]{
-        new HorizontalLayout(),
-        new VerticalLayout()
-    };
+    public static final Random RANDOM = new Random(intConfigParam("seed"));
+    public static final List<LayoutGenerator> LAYOUTS
+            = List.of(
+                    new HorizontalLayout(),
+                    new VerticalLayout(),
+                    new TabLayout()
+            );
+    public static final List<ComponentGenerator> COMPONENTS = List.of(
+            new Button(),
+            new TextFieldWithTopLabel(),
+            new TextFieldWithLeftLabel(),
+            new Checkbox(),
+            new ComboBox(),
+            new TextAreaWithTopLabel()
+    );
+    public static final List<ComponentGenerator> ALL
+            = Stream.concat(LAYOUTS.stream(), COMPONENTS.stream()).toList();
 
-    public static LayoutGenerator pickLayout(String parentCategory) {
-        LayoutGenerator layout = null;
+    public static <T extends ComponentGenerator> Container addChild(Container layout, List<T> generators) {
+        T generator = null;
 
-        while (layout == null) {
-            var candidate = LAYOUTS[RANDOM.nextInt(LAYOUTS.length)];
+        while (generator == null) {
+            var candidate = generators.get(RANDOM.nextInt(generators.size()));
 
-            if (parentCategory == null || !candidate.forbid(parentCategory)) {
-                layout = candidate;
+            if (!candidate.forbid(layout.getName())) {
+                generator = candidate;
             }
         }
 
-        return layout;
+        return generator.add(layout);
     }
 
     private static final UIManager.LookAndFeelInfo[] lookAndFeels;
@@ -193,11 +220,8 @@ public class Intgen {
             UIManager.installLookAndFeel(laf.getSimpleName(), laf.getName());
         });
         lookAndFeels = UIManager.getInstalledLookAndFeels();
-        for (var i = 0; i < LAYOUTS.length; i++) {
-            categoryMap.put((LAYOUTS[i]).getCategory(), i);
-        }
-        for (var i = 0; i < COMPONENTS.length; i++) {
-            categoryMap.put((COMPONENTS[i]).getCategory(), i + LAYOUTS.length);
+        for (var i = 0; i < ALL.size(); i++) {
+            categoryMap.put(ALL.get(i).getCategory(), i);
         }
 
         try {
@@ -227,7 +251,6 @@ public class Intgen {
         "\uD83D\uDCE6", // Inbox Tray
         "\uD83D\uDCE8", // Outbox Tray
         "\uD83D\uDCDD", // Notebook
-        "\uD83D\uDCDD\uD83D\uDCD0", // Notebook with Decorative Cover
     };
 
     public static String emoji() {
@@ -235,56 +258,60 @@ public class Intgen {
     }
 
     private static void createAndShowGui(Phase phase, CountDownLatch latch, int imageId) {
-        SwingUtilities.invokeLater(() -> {
-            try {
-                var lookAndFeelClassName = lookAndFeels[RANDOM.nextInt(lookAndFeels.length)].getClassName();
-                UIManager.setLookAndFeel(lookAndFeelClassName);
+        try {
+            var lookAndFeelClassName = lookAndFeels[RANDOM.nextInt(lookAndFeels.length)].getClassName();
+            UIManager.setLookAndFeel(lookAndFeelClassName);
 
-                if (lookAndFeelClassName.equals("javax.swing.plaf.metal.MetalLookAndFeel")) {
-                    if (RANDOM.nextBoolean()) {
-                        MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
-                    } else {
-                        MetalLookAndFeel.setCurrentTheme(new OceanTheme());
-                    }
+            if (lookAndFeelClassName.equals("javax.swing.plaf.metal.MetalLookAndFeel")) {
+                if (RANDOM.nextBoolean()) {
+                    MetalLookAndFeel.setCurrentTheme(new DefaultMetalTheme());
+                } else {
+                    MetalLookAndFeel.setCurrentTheme(new OceanTheme());
                 }
-
-                var frame = new JFrame("Random Swing App");
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.addWindowListener(new WindowAdapterExtension(phase, frame, imageId, latch));
-
-                var layouts = new ArrayList<Container>();
-                var contentPane = frame.getContentPane();
-                layouts.add(contentPane);
-                frame.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
-
-                var layoutCount = RANDOM.nextInt(0, 5);
-                for (var i = 0; i < layoutCount; i++) {
-                    var parent = layouts.get(RANDOM.nextInt(layouts.size()));
-                    var child = pickLayout(parent.getName()).generate();
-                    parent.add(child);
-                    layouts.add(child);
-                }
-
-                layouts.forEach(l -> {
-                    while (l.getComponentCount() < 2) {
-                        var component = COMPONENTS[RANDOM.nextInt(COMPONENTS.length)];
-                        l.add(component.generate());
-                    }
-                });
-
-                var componentCount = 5 + RANDOM.nextInt(40);
-                for (int i = 0; i < componentCount; i++) {
-                    var component = COMPONENTS[RANDOM.nextInt(COMPONENTS.length)];
-                    layouts.get(RANDOM.nextInt(layouts.size())).add(component.generate());
-                }
-
-                frame.pack();
-                frame.setLocationRelativeTo(null);
-                frame.setVisible(true);
-            } catch (HeadlessException | ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
-                throw new RuntimeException(e);
             }
-        });
+
+            var frame = new JFrame("Random Swing App");
+
+            var layouts = new ArrayList<Container>();
+            var contentPane = frame.getContentPane();
+            layouts.add(contentPane);
+            frame.setLayout(new BoxLayout(contentPane, BoxLayout.Y_AXIS));
+
+            var layoutCount = RANDOM.nextInt(1, intConfigParam("maxLayouts"));
+            for (var i = 0; i < layoutCount; i++) {
+                var parent = layouts.get(RANDOM.nextInt(layouts.size()));
+                Container layout = Intgen.addChild(parent, LAYOUTS);
+                layouts.add(layout);
+            }
+
+            for (Container layout : layouts) {
+                String name = layout.getName();
+
+                if (name != null && categoryMap.containsKey(name)) {
+                    var count = RANDOM.nextInt(2, intConfigParam("maxChildren" + name));
+
+                    while (layout.getComponentCount() < count) {
+                        addChild(layout, COMPONENTS);
+                    }
+                }
+            }
+
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+
+            var bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+            if (frame.getSize().width > bounds.width || frame.getSize().height > bounds.height) {
+                // frame is too big, create another one
+                frame.dispose();
+                createAndShowGui(phase, latch, imageId);
+            } else {
+                // frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.addWindowListener(new WindowAdapterExtension(phase, frame, imageId, latch));
+                frame.setVisible(true);
+            }
+        } catch (HeadlessException | ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static void labelComponent(PrintWriter out, Component component, Component relativeTo, int imageId) {

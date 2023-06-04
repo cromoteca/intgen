@@ -9,14 +9,15 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class TextFieldWithLeftLabel implements ComponentGenerator {
+public class TextFieldWithLeftLabel implements ComponentGenerator<JPanel> {
 
     @Override
-    public JPanel _generate() {
+    public JPanel generate() {
         var panel = new JPanel(new BorderLayout());
         var label = new JLabel(Intgen.words(1, 3));
         var textField = new JTextField();
         textField.setPreferredSize(new Dimension(100, textField.getPreferredSize().height));
+        textField.setText(Intgen.words(0, 3));
 
         panel.add(label, BorderLayout.WEST);
         panel.add(textField, BorderLayout.CENTER);

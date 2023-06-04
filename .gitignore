@@ -1,3 +1,4 @@
 /target/
 /runs/
 yolo*.pt
+/intgen.properties

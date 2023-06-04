@@ -1,37 +1,26 @@
 package com.vaadin.intgen;
 
 import java.awt.Container;
-import java.util.ArrayList;
-import java.util.List;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
 
-public abstract class LayoutGenerator implements ComponentGenerator {
-
-    private final List<ComponentGenerator> children = new ArrayList<>();
+public abstract class LayoutGenerator implements ComponentGenerator<JComponent> {
 
     @Override
-    public Container generate() {
-        var container = _generate();
-        container.setName(getCategory());
+    public JComponent add(Container parent) {
+        var container = generate();
+        var wrapper = generateWrapper(container);
 
-        for (var child : children) {
-            container.add(child.generate());
+        if (Intgen.RANDOM.nextDouble() > 0.8) {
+            wrapper.setBorder(BorderFactory.createTitledBorder(Intgen.words(1, 3)));
         }
 
+        container.setName(getCategory());
+        parent.add(wrapper, Intgen.RANDOM.nextInt(-1, parent.getComponentCount()));
         return container;
     }
 
-    public boolean forbid(String parentCategory) {
-        return false;
+    public JComponent generateWrapper(JComponent container) {
+        return container;
     }
-
-    public void addChild(ComponentGenerator child) {
-        children.add(child);
-    }
-
-    public List<ComponentGenerator> getChildren() {
-        return children;
-    }
-
-    @Override
-    public abstract Container _generate();
 }
