@@ -9,6 +9,7 @@ import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import com.vaadin.intgen.components.Button;
 import com.vaadin.intgen.components.Checkbox;
 import com.vaadin.intgen.components.ComboBox;
+import com.vaadin.intgen.components.RadioButtons;
 import com.vaadin.intgen.components.TextAreaWithTopLabel;
 import com.vaadin.intgen.components.TextFieldWithLeftLabel;
 import com.vaadin.intgen.components.TextFieldWithTopLabel;
@@ -100,6 +101,10 @@ public class Intgen {
         return Integer.parseInt(config.getProperty(key));
     }
 
+    static boolean booleanConfigParam(String key) {
+        return Boolean.parseBoolean(key);
+    }
+
     enum Phase {
         TRAIN(intConfigParam("train")),
         VALID(intConfigParam("valid")),
@@ -165,9 +170,13 @@ public class Intgen {
             // the Graphics object l the image.
             frame.paint(image.getGraphics());
             var capturedImage = image;
-            var resizedImage = resizeImage(capturedImage, IMAGE_SIZE, IMAGE_SIZE);
+
+            if (booleanConfigParam("resize")) {
+                capturedImage = resizeImage(capturedImage, IMAGE_SIZE, IMAGE_SIZE);
+            }
+
             // Save as PNG
-            ImageIO.write(resizedImage, "png", file);
+            ImageIO.write(capturedImage, "png", file);
         }
 
         public static BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) {
@@ -180,19 +189,19 @@ public class Intgen {
     }
 
     public static final Random RANDOM = new Random(intConfigParam("seed"));
-    public static final List<LayoutGenerator> LAYOUTS
-            = List.of(
-                    new HorizontalLayout(),
-                    new VerticalLayout(),
-                    new TabLayout()
-            );
+    public static final List<LayoutGenerator> LAYOUTS = List.of(
+            new HorizontalLayout(),
+            new VerticalLayout(),
+            new TabLayout()
+    );
     public static final List<ComponentGenerator> COMPONENTS = List.of(
             new Button(),
             new TextFieldWithTopLabel(),
             new TextFieldWithLeftLabel(),
             new Checkbox(),
             new ComboBox(),
-            new TextAreaWithTopLabel()
+            new TextAreaWithTopLabel(),
+            new RadioButtons()
     );
     public static final List<ComponentGenerator> ALL
             = Stream.concat(LAYOUTS.stream(), COMPONENTS.stream()).toList();

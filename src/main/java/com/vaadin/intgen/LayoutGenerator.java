@@ -13,6 +13,9 @@ public abstract class LayoutGenerator implements ComponentGenerator<JComponent> 
 
         if (Intgen.RANDOM.nextDouble() > 0.8) {
             wrapper.setBorder(BorderFactory.createTitledBorder(Intgen.words(1, 3)));
+        } else {
+            var padding = Intgen.RANDOM.nextInt(10);
+            wrapper.setBorder(BorderFactory.createEmptyBorder(padding, padding, padding, padding));
         }
 
         container.setName(getCategory());

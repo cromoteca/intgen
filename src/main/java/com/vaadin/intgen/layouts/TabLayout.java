@@ -2,10 +2,6 @@ package com.vaadin.intgen.layouts;
 
 import com.vaadin.intgen.Intgen;
 import com.vaadin.intgen.LayoutGenerator;
-import java.awt.Color;
-import java.awt.Container;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;

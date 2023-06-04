@@ -1,13 +1,8 @@
 package com.vaadin.intgen.layouts;
 
 import com.vaadin.intgen.LayoutGenerator;
-import java.awt.Color;
-import java.awt.Container;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 
 public class HorizontalLayout extends LayoutGenerator {
 
@@ -18,10 +13,10 @@ public class HorizontalLayout extends LayoutGenerator {
 
     @Override
     public JComponent generateWrapper(JComponent container) {
-        var wrapper = Box.createHorizontalBox();
-        wrapper.add(container);
-        wrapper.add(Box.createHorizontalGlue());
-        return wrapper;
+        var box = Box.createHorizontalBox();
+        box.add(container);
+        box.add(Box.createHorizontalGlue());
+        return box;
     }
 
     @Override

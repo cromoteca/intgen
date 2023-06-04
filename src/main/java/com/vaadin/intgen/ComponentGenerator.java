@@ -1,9 +1,7 @@
 package com.vaadin.intgen;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 
 public interface ComponentGenerator<T extends Component> {

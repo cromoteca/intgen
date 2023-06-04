@@ -4,7 +4,6 @@ import com.vaadin.intgen.ComponentGenerator;
 import com.vaadin.intgen.Intgen;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
