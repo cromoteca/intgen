@@ -203,8 +203,12 @@ public class Intgen {
             new TextAreaWithTopLabel(),
             new RadioButtons()
     );
+    public static final List<ComponentGenerator> OTHER_COMPONENTS = List.of(
+            new TabLayout.Tab(),
+            new TabLayout.ActiveTab()
+    );
     public static final List<ComponentGenerator> ALL
-            = Stream.concat(LAYOUTS.stream(), COMPONENTS.stream()).toList();
+            = Stream.concat(LAYOUTS.stream(), Stream.concat(COMPONENTS.stream(), OTHER_COMPONENTS.stream())).toList();
 
     public static <T extends ComponentGenerator> Container addChild(Container layout, List<T> generators) {
         T generator = null;

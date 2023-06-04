@@ -1,8 +1,10 @@
 package com.vaadin.intgen.layouts;
 
+import com.vaadin.intgen.ComponentGenerator;
 import com.vaadin.intgen.Intgen;
 import com.vaadin.intgen.LayoutGenerator;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
@@ -10,6 +12,8 @@ public class TabLayout extends LayoutGenerator {
 
     private static final HorizontalLayout HORIZONTAL_LAYOUT = new HorizontalLayout();
     private static final VerticalLayout VERTICAL_LAYOUT = new VerticalLayout();
+    private static final Tab TAB = new Tab();
+    private static final ActiveTab ACTIVE_TAB = new ActiveTab();
 
     @Override
     public JComponent generate() {
@@ -18,23 +22,41 @@ public class TabLayout extends LayoutGenerator {
 
     @Override
     public JTabbedPane generateWrapper(JComponent container) {
-        var wrapper = new JTabbedPane();
+        var tabbedPane = new JTabbedPane();
         var tabCount = Intgen.RANDOM.nextInt(2, 6);
         var selectedTab = Intgen.RANDOM.nextInt(tabCount);
 
         for (int i = 0; i < tabCount; i++) {
-            var component = i == selectedTab
-                    ? container
-                    : new JPanel();
-            wrapper.addTab(Intgen.words(1, 3), component);
+            var component = i == selectedTab ? container : new JPanel();
+            tabbedPane.addTab(null, component);
+            var generator = i == selectedTab ? ACTIVE_TAB : TAB;
+            tabbedPane.setTabComponentAt(i, generator.generate());
         }
 
-        wrapper.setSelectedIndex(selectedTab);
-        return wrapper;
+        tabbedPane.setSelectedIndex(selectedTab);
+        return tabbedPane;
     }
 
     @Override
     public boolean forbid(String parentCategory) {
         return VERTICAL_LAYOUT.getCategory().equals(parentCategory);
+    }
+
+    public static class Tab implements ComponentGenerator<JLabel> {
+
+        @Override
+        public JLabel generate() {
+            return new JLabel(Intgen.words(1, 2));
+        }
+
+    }
+
+    public static class ActiveTab implements ComponentGenerator<JLabel> {
+
+        @Override
+        public JLabel generate() {
+            return new JLabel(Intgen.words(1, 2));
+        }
+
     }
 }
