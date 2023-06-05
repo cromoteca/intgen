@@ -226,9 +226,10 @@ public class Intgen {
         return generator.add(layout);
     }
 
-    private static final UIManager.LookAndFeelInfo[] lookAndFeels;
     private static final Map<String, Integer> categoryMap = new HashMap<>();
     private static final List<String> WORDS;
+
+    private static final UIManager.LookAndFeelInfo[] lookAndFeels;
 
     static {
         Stream.of(FlatDarculaLaf.class, FlatDarkLaf.class, FlatIntelliJLaf.class, FlatLightLaf.class, FlatMacLightLaf.class, FlatMacDarkLaf.class).forEach(laf -> {
@@ -246,6 +247,7 @@ public class Intgen {
             throw new RuntimeException(e);
         }
     }
+    private static final String[] flatThemes = new String[]{"Arc Dark", "Cobalt_2", "GitHub"};
 
     public static String words(int min, int max) {
         return IntStream.rangeClosed(min, min + RANDOM.nextInt(max - min + 1))
@@ -274,11 +276,13 @@ public class Intgen {
 
     private static void createAndShowGui(Phase phase, CountDownLatch latch, int imageId) {
         try {
-            if (RANDOM.nextBoolean()) {
-                var lookAndFeelClassName = lookAndFeels[RANDOM.nextInt(lookAndFeels.length)].getClassName();
+            var lafNumber = RANDOM.nextInt(lookAndFeels.length + flatThemes.length);
+            if (lafNumber < lookAndFeels.length) {
+                var lookAndFeelClassName = lookAndFeels[lafNumber].getClassName();
                 UIManager.setLookAndFeel(lookAndFeelClassName);
             } else {
-                IntelliJTheme.setup(Intgen.class.getResourceAsStream("/GitHub.theme.json"));
+                var themeName = flatThemes[lafNumber - lookAndFeels.length];
+                IntelliJTheme.setup(Intgen.class.getResourceAsStream("/themes/" + themeName + ".theme.json"));
             }
 
             var frame = new JFrame("Random Swing App");
