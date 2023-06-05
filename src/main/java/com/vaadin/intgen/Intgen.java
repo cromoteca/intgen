@@ -56,6 +56,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import org.imgscalr.Scalr;
 
 public class Intgen {
 
@@ -180,7 +181,7 @@ public class Intgen {
 
             if (booleanConfigParam("resize")) {
                 var imageSize = intConfigParam("imageSize");
-                capturedImage = resizeImage(capturedImage, imageSize, imageSize);
+                capturedImage = Scalr.resize(capturedImage, Scalr.Mode.FIT_EXACT, imageSize, imageSize, Scalr.OP_ANTIALIAS);
             }
 
             // Save as PNG
