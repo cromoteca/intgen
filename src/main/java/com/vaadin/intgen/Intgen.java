@@ -250,7 +250,7 @@ public class Intgen {
     private static final String[] flatThemes = new String[]{"Arc Dark", "Cobalt_2", "GitHub"};
 
     public static String words(int min, int max) {
-        return IntStream.rangeClosed(min, min + RANDOM.nextInt(max - min + 1))
+        return IntStream.rangeClosed(min + 1, min + RANDOM.nextInt(max - min + 1))
                 .mapToObj(n -> WORDS.get(RANDOM.nextInt(WORDS.size())))
                 .collect(Collectors.joining(" "));
     }
