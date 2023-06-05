@@ -10,8 +10,14 @@ import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import com.vaadin.intgen.components.Button;
 import com.vaadin.intgen.components.Checkbox;
 import com.vaadin.intgen.components.ComboBox;
-import com.vaadin.intgen.components.RadioButtons;
+import com.vaadin.intgen.components.ComboBoxWithLeftLabel;
+import com.vaadin.intgen.components.ComboBoxWithTopLabel;
+import com.vaadin.intgen.components.HorizontalRadioButtons;
+import com.vaadin.intgen.components.VerticalRadioButtons;
+import com.vaadin.intgen.components.TextArea;
+import com.vaadin.intgen.components.TextAreaWithLeftLabel;
 import com.vaadin.intgen.components.TextAreaWithTopLabel;
+import com.vaadin.intgen.components.TextField;
 import com.vaadin.intgen.components.TextFieldWithLeftLabel;
 import com.vaadin.intgen.components.TextFieldWithTopLabel;
 import com.vaadin.intgen.layouts.HorizontalLayout;
@@ -196,14 +202,19 @@ public class Intgen {
             new VerticalLayout(),
             new TabLayout()
     );
-    public static final List<ComponentGenerator> COMPONENTS = List.of(
-            new Button(),
+    public static final List<ComponentGenerator> COMPONENTS = List.of(new Button(),
+            new TextField(),
             new TextFieldWithTopLabel(),
             new TextFieldWithLeftLabel(),
             new Checkbox(),
             new ComboBox(),
+            new ComboBoxWithTopLabel(),
+            new ComboBoxWithLeftLabel(),
+            new TextArea(),
             new TextAreaWithTopLabel(),
-            new RadioButtons()
+            new TextAreaWithLeftLabel(),
+            new VerticalRadioButtons(),
+            new HorizontalRadioButtons()
     );
     public static final List<ComponentGenerator> OTHER_COMPONENTS = List.of(
             new TabLayout.Tab(),
@@ -250,9 +261,15 @@ public class Intgen {
     private static final String[] flatThemes = new String[]{"Arc Dark", "Cobalt_2", "GitHub"};
 
     public static String words(int min, int max) {
-        return IntStream.rangeClosed(min + 1, min + RANDOM.nextInt(max - min + 1))
+        return IntStream.rangeClosed(1, min + RANDOM.nextInt(max - min + 1))
                 .mapToObj(n -> WORDS.get(RANDOM.nextInt(WORDS.size())))
                 .collect(Collectors.joining(" "));
+    }
+
+    public static String wordLines(int min, int max, int maxWordsPerLine) {
+        return IntStream.rangeClosed(1, min + RANDOM.nextInt(max - min + 1))
+                .mapToObj(n -> words(1, maxWordsPerLine))
+                .collect(Collectors.joining("\n"));
     }
 
     private static final String[] emojis = {
