@@ -3,6 +3,7 @@ package com.vaadin.intgen.components;
 import com.vaadin.intgen.ComponentGenerator;
 import com.vaadin.intgen.Intgen;
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -20,6 +21,14 @@ public class ComponentWithLabel implements ComponentGenerator<JPanel> {
     public JPanel generate() {
         var panel = new JPanel(new BorderLayout());
         var label = new JLabel(Intgen.words(1, 3));
+
+        if (labelPosition == LabelPosition.LEFT) {
+            label.setPreferredSize(new Dimension(
+                    label.getPreferredSize().width + Intgen.RANDOM.nextInt(100),
+                    label.getPreferredSize().height
+            ));
+            label.setAlignmentX(Intgen.RANDOM.nextFloat());
+        }
 
         panel.add(label, labelPosition.getPosition());
         panel.add(field.generate(), BorderLayout.CENTER);
