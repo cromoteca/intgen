@@ -104,7 +104,7 @@ public class Intgen {
     }
 
     static boolean booleanConfigParam(String key) {
-        return Boolean.parseBoolean(key);
+        return Boolean.parseBoolean(config.getProperty(key));
     }
 
     enum Phase {
@@ -130,7 +130,6 @@ public class Intgen {
             return new File(DATASET, name().toLowerCase() + "/labels");
         }
     }
-    public static final int IMAGE_SIZE = intConfigParam("imageSize");
     public static final File DATASET = new File(config.getProperty("datasetLocation"));
 
     private static final class WindowAdapterExtension extends WindowAdapter {
@@ -174,7 +173,8 @@ public class Intgen {
             var capturedImage = image;
 
             if (booleanConfigParam("resize")) {
-                capturedImage = resizeImage(capturedImage, IMAGE_SIZE, IMAGE_SIZE);
+                var imageSize = intConfigParam("imageSize");
+                capturedImage = resizeImage(capturedImage, imageSize, imageSize);
             }
 
             // Save as PNG
