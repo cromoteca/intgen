@@ -12,6 +12,7 @@ import com.vaadin.intgen.components.Checkbox;
 import com.vaadin.intgen.components.ComboBox;
 import com.vaadin.intgen.components.ComboBoxWithLeftLabel;
 import com.vaadin.intgen.components.ComboBoxWithTopLabel;
+import com.vaadin.intgen.components.Grid;
 import com.vaadin.intgen.components.HorizontalRadioButtons;
 import com.vaadin.intgen.components.TextArea;
 import com.vaadin.intgen.components.TextAreaWithLeftLabel;
@@ -223,7 +224,8 @@ public class Intgen {
           new TextAreaWithTopLabel(),
           new TextAreaWithLeftLabel(),
           new VerticalRadioButtons(),
-          new HorizontalRadioButtons());
+          new HorizontalRadioButtons(),
+          new Grid());
   public static final List<ComponentGenerator> OTHER_COMPONENTS =
       List.of(new TabLayout.Tab(), new TabLayout.ActiveTab());
   public static final List<ComponentGenerator> ALL =
