@@ -7,12 +7,11 @@ import javax.swing.JTextField;
 
 public class TextField implements ComponentGenerator<JTextField> {
 
-    @Override
-    public JTextField generate() {
-        var textField = new JTextField();
-        textField.setPreferredSize(new Dimension(100, textField.getPreferredSize().height));
-        textField.setText(Intgen.words(0, 3));
-        return textField;
-    }
-
+  @Override
+  public JTextField generate() {
+    var textField = new JTextField();
+    textField.setPreferredSize(new Dimension(100, textField.getPreferredSize().height));
+    textField.setText(Intgen.words(0, 3));
+    return textField;
+  }
 }

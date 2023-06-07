@@ -6,9 +6,8 @@ import javax.swing.JCheckBox;
 
 public class Checkbox implements ComponentGenerator<JCheckBox> {
 
-    @Override
-    public JCheckBox generate() {
-        return new JCheckBox(Intgen.words(2, 6), Intgen.RANDOM.nextBoolean());
-    }
-
+  @Override
+  public JCheckBox generate() {
+    return new JCheckBox(Intgen.words(2, 6), Intgen.RANDOM.nextBoolean());
+  }
 }

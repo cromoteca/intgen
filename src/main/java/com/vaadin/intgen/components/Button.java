@@ -6,17 +6,16 @@ import javax.swing.JButton;
 
 public class Button implements ComponentGenerator<JButton> {
 
-    @Override
-    public JButton generate() {
-        String buttonText;
+  @Override
+  public JButton generate() {
+    String buttonText;
 
-        if (Intgen.RANDOM.nextBoolean()) {
-            buttonText = Intgen.emoji() + ' ' + Intgen.words(0, 2);
-        } else {
-            buttonText = Intgen.words(1, 2);
-        }
-
-        return new JButton(buttonText);
+    if (Intgen.RANDOM.nextBoolean()) {
+      buttonText = Intgen.emoji() + ' ' + Intgen.words(0, 2);
+    } else {
+      buttonText = Intgen.words(1, 2);
     }
 
+    return new JButton(buttonText);
+  }
 }
