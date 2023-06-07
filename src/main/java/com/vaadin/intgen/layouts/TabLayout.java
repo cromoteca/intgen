@@ -3,6 +3,7 @@ package com.vaadin.intgen.layouts;
 import com.vaadin.intgen.ComponentGenerator;
 import com.vaadin.intgen.Intgen;
 import com.vaadin.intgen.LayoutGenerator;
+import java.awt.Dimension;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -34,6 +35,11 @@ public class TabLayout extends LayoutGenerator {
     }
 
     tabbedPane.setSelectedIndex(selectedTab);
+    tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+    tabbedPane.setMinimumSize(
+        new Dimension(
+            Math.max(tabbedPane.getMinimumSize().width, 50 * tabCount),
+            tabbedPane.getMinimumSize().height));
     return tabbedPane;
   }
 
