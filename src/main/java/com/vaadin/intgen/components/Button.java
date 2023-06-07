@@ -18,4 +18,13 @@ public class Button implements ComponentGenerator<JButton> {
 
     return new JButton(buttonText);
   }
+
+  // dummy generator
+  public static class DefaultButton implements ComponentGenerator<JButton> {
+
+    @Override
+    public JButton generate() {
+      return new JButton();
+    }
+  }
 }

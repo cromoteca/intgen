@@ -4,7 +4,7 @@ import com.vaadin.intgen.LayoutGenerator;
 import javax.swing.Box;
 import javax.swing.JComponent;
 
-public class VerticalLayout extends LayoutGenerator {
+public class LayoutVertical extends LayoutGenerator {
 
   @Override
   public Box generate() {
@@ -17,10 +17,5 @@ public class VerticalLayout extends LayoutGenerator {
     box.add(container);
     box.add(Box.createVerticalGlue());
     return box;
-  }
-
-  @Override
-  public boolean forbid(String parentCategory) {
-    return getCategory().equals(parentCategory);
   }
 }

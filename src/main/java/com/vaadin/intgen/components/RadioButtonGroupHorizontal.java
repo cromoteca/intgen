@@ -5,7 +5,7 @@ import com.vaadin.intgen.Intgen;
 import javax.swing.Box;
 import javax.swing.JRadioButton;
 
-public class HorizontalRadioButtons implements ComponentGenerator<Box> {
+public class RadioButtonGroupHorizontal implements ComponentGenerator<Box> {
 
   @Override
   public Box generate() {

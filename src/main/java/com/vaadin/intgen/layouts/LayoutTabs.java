@@ -9,12 +9,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 
-public class TabLayout extends LayoutGenerator {
+public class LayoutTabs extends LayoutGenerator {
 
-  private static final HorizontalLayout HORIZONTAL_LAYOUT = new HorizontalLayout();
-  private static final VerticalLayout VERTICAL_LAYOUT = new VerticalLayout();
+  private static final LayoutHorizontal HORIZONTAL_LAYOUT = new LayoutHorizontal();
+  private static final LayoutVertical VERTICAL_LAYOUT = new LayoutVertical();
   private static final Tab TAB = new Tab();
-  private static final ActiveTab ACTIVE_TAB = new ActiveTab();
+  private static final TabActive ACTIVE_TAB = new TabActive();
 
   @Override
   public JComponent generate() {
@@ -43,11 +43,6 @@ public class TabLayout extends LayoutGenerator {
     return tabbedPane;
   }
 
-  @Override
-  public boolean forbid(String parentCategory) {
-    return VERTICAL_LAYOUT.getCategory().equals(parentCategory);
-  }
-
   public static class Tab implements ComponentGenerator<JLabel> {
 
     @Override
@@ -56,7 +51,7 @@ public class TabLayout extends LayoutGenerator {
     }
   }
 
-  public static class ActiveTab implements ComponentGenerator<JLabel> {
+  public static class TabActive implements ComponentGenerator<JLabel> {
 
     @Override
     public JLabel generate() {

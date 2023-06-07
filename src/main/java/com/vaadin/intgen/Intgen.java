@@ -13,17 +13,18 @@ import com.vaadin.intgen.components.ComboBox;
 import com.vaadin.intgen.components.ComboBoxWithLeftLabel;
 import com.vaadin.intgen.components.ComboBoxWithTopLabel;
 import com.vaadin.intgen.components.Grid;
-import com.vaadin.intgen.components.HorizontalRadioButtons;
+import com.vaadin.intgen.components.RadioButtonGroupHorizontal;
+import com.vaadin.intgen.components.RadioButtonGroupVertical;
 import com.vaadin.intgen.components.TextArea;
 import com.vaadin.intgen.components.TextAreaWithLeftLabel;
 import com.vaadin.intgen.components.TextAreaWithTopLabel;
 import com.vaadin.intgen.components.TextField;
 import com.vaadin.intgen.components.TextFieldWithLeftLabel;
 import com.vaadin.intgen.components.TextFieldWithTopLabel;
-import com.vaadin.intgen.components.VerticalRadioButtons;
-import com.vaadin.intgen.layouts.HorizontalLayout;
-import com.vaadin.intgen.layouts.TabLayout;
-import com.vaadin.intgen.layouts.VerticalLayout;
+import com.vaadin.intgen.layouts.LayoutGrid;
+import com.vaadin.intgen.layouts.LayoutHorizontal;
+import com.vaadin.intgen.layouts.LayoutTabs;
+import com.vaadin.intgen.layouts.LayoutVertical;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.GraphicsEnvironment;
@@ -45,14 +46,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Random;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -83,11 +88,7 @@ public class Intgen {
       }
     }
 
-    var names =
-        ALL.stream()
-            .map(ComponentGenerator::getCategory)
-            .map(cat -> "'" + cat + "'")
-            .collect(Collectors.joining(", "));
+    var names = ALL.stream().map(cat -> "'" + cat + "'").collect(Collectors.joining(", "));
 
     var yaml = new File(DATASET, "data.yaml");
     try (var out = new PrintWriter(new BufferedWriter(new FileWriter(yaml, false)))) {
@@ -100,23 +101,23 @@ public class Intgen {
     }
   }
 
-  static final Properties config = new Properties();
+  public static final Properties CONFIG = new Properties();
 
   static {
     try (var reader =
         new FileReader(new File(System.getProperty("user.dir"), "intgen.properties"))) {
-      config.load(reader);
+      CONFIG.load(reader);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
-  static int intConfigParam(String key) {
-    return Integer.parseInt(config.getProperty(key));
+  public static int intConfigParam(String key) {
+    return Integer.parseInt(CONFIG.getProperty(key));
   }
 
-  static boolean booleanConfigParam(String key) {
-    return Boolean.parseBoolean(config.getProperty(key));
+  public static boolean booleanConfigParam(String key) {
+    return Boolean.parseBoolean(CONFIG.getProperty(key));
   }
 
   enum Phase {
@@ -143,7 +144,7 @@ public class Intgen {
     }
   }
 
-  public static final File DATASET = new File(config.getProperty("datasetLocation"));
+  public static final File DATASET = new File(CONFIG.getProperty("datasetLocation"));
 
   private static final class WindowAdapterExtension extends WindowAdapter {
 
@@ -209,28 +210,49 @@ public class Intgen {
 
   public static final Random RANDOM = new Random(intConfigParam("seed"));
   public static final List<LayoutGenerator> LAYOUTS =
-      List.of(new HorizontalLayout(), new VerticalLayout(), new TabLayout());
+      List.of(
+          new LayoutHorizontal(),
+          new LayoutGrid(),
+          new LayoutHorizontal(),
+          new LayoutHorizontal(),
+          new LayoutHorizontal(),
+          new LayoutTabs(),
+          new LayoutVertical(),
+          new LayoutVertical(),
+          new LayoutVertical(),
+          new LayoutVertical(),
+          new LayoutVertical());
   public static final List<ComponentGenerator> COMPONENTS =
       List.of(
           new Button(),
-          new TextField(),
-          new TextFieldWithTopLabel(),
-          new TextFieldWithLeftLabel(),
+          new Button(),
           new Checkbox(),
           new ComboBox(),
-          new ComboBoxWithTopLabel(),
           new ComboBoxWithLeftLabel(),
+          new ComboBoxWithTopLabel(),
+          new Grid(),
+          new RadioButtonGroupHorizontal(),
+          new RadioButtonGroupVertical(),
           new TextArea(),
-          new TextAreaWithTopLabel(),
           new TextAreaWithLeftLabel(),
-          new VerticalRadioButtons(),
-          new HorizontalRadioButtons(),
-          new Grid());
+          new TextAreaWithTopLabel(),
+          new TextField(),
+          new TextFieldWithLeftLabel(),
+          new TextFieldWithLeftLabel(),
+          new TextFieldWithLeftLabel(),
+          new TextFieldWithLeftLabel(),
+          new TextFieldWithLeftLabel(),
+          new TextFieldWithTopLabel(),
+          new TextFieldWithTopLabel(),
+          new TextFieldWithTopLabel(),
+          new TextFieldWithTopLabel(),
+          new TextFieldWithTopLabel());
   public static final List<ComponentGenerator> OTHER_COMPONENTS =
-      List.of(new TabLayout.Tab(), new TabLayout.ActiveTab());
-  public static final List<ComponentGenerator> ALL =
+      List.of(new Button.DefaultButton(), new LayoutTabs.TabActive(), new LayoutTabs.Tab());
+  public static final SortedSet<String> ALL =
       Stream.concat(LAYOUTS.stream(), Stream.concat(COMPONENTS.stream(), OTHER_COMPONENTS.stream()))
-          .toList();
+          .map(ComponentGenerator::getCategory)
+          .collect(Collectors.toCollection(TreeSet::new));
 
   public static <T extends ComponentGenerator> Container addChild(
       Container layout, List<T> generators) {
@@ -265,8 +287,10 @@ public class Intgen {
               UIManager.installLookAndFeel(laf.getSimpleName(), laf.getName());
             });
     lookAndFeels = UIManager.getInstalledLookAndFeels();
-    for (var i = 0; i < ALL.size(); i++) {
-      categoryMap.put(ALL.get(i).getCategory(), i);
+
+    var index = 0;
+    for (var category : ALL) {
+      categoryMap.put(category, index++);
     }
 
     try {
@@ -345,6 +369,18 @@ public class Intgen {
           while (layout.getComponentCount() < count) {
             addChild(layout, COMPONENTS);
           }
+
+          IntStream.range(0, layout.getComponentCount())
+              .forEach(
+                  i -> {
+                    var component = layout.getComponent(i);
+                    if (component instanceof JButton button) {
+                      frame.getRootPane().setDefaultButton(button);
+                    }
+                  });
+
+          Optional.ofNullable(frame.getRootPane().getDefaultButton())
+              .ifPresent(b -> b.setName("DefaultButton"));
         }
       }
 
