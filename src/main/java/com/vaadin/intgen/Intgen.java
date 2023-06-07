@@ -170,7 +170,7 @@ public class Intgen {
 
       try (var out = new PrintWriter(new BufferedWriter(new FileWriter(labelFile, false)))) {
         takeScreenshot(imageFile, contentPane);
-        labelComponent(out, contentPane, contentPane, imageId);
+        labelComponent(out, contentPane, contentPane);
       } catch (IOException ex) {
         throw new RuntimeException(ex);
       }
@@ -406,8 +406,7 @@ public class Intgen {
     }
   }
 
-  private static void labelComponent(
-      PrintWriter out, Component component, Component relativeTo, int imageId) {
+  private static void labelComponent(PrintWriter out, Component component, Component relativeTo) {
     var categoryId = categoryMap.get(component.getName());
 
     if (categoryId != null) {
@@ -422,7 +421,7 @@ public class Intgen {
 
     if (component instanceof Container container) {
       for (var child : container.getComponents()) {
-        labelComponent(out, child, relativeTo, imageId);
+        labelComponent(out, child, relativeTo);
       }
     }
   }
