@@ -3,3 +3,4 @@
 yolo*.pt
 /intgen.properties
 .idea/
+.vscode/
