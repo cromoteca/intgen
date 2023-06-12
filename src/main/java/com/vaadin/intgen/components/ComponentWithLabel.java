@@ -19,15 +19,15 @@ public class ComponentWithLabel implements ComponentGenerator<JPanel> {
 
   @Override
   public JPanel generate() {
-    var panel = new JPanel(new BorderLayout());
-    var label = new JLabel(Intgen.words(1, 3));
+    var borderLayout = new BorderLayout();
+    borderLayout.setHgap(Intgen.RANDOM.nextInt(10));
+    borderLayout.setVgap(Intgen.RANDOM.nextInt(10));
+    var panel = new JPanel(borderLayout);
+    var label =
+        new JLabel(Intgen.words(1, 3), Intgen.RANDOM.nextBoolean() ? JLabel.LEFT : JLabel.RIGHT);
 
     if (labelPosition == LabelPosition.LEFT) {
-      label.setPreferredSize(
-          new Dimension(
-              label.getPreferredSize().width + Intgen.RANDOM.nextInt(100),
-              label.getPreferredSize().height));
-      label.setAlignmentX(Intgen.RANDOM.nextFloat());
+      sizeLabel(label);
     }
 
     panel.add(label, labelPosition.getPosition());
@@ -39,6 +39,13 @@ public class ComponentWithLabel implements ComponentGenerator<JPanel> {
   @Override
   public String getCategory() {
     return field.getCategory() + "With" + labelPosition.titleCaseName() + "Label";
+  }
+
+  protected void sizeLabel(JLabel label) {
+    label.setPreferredSize(
+        new Dimension(
+            label.getPreferredSize().width + Intgen.RANDOM.nextInt(100),
+            label.getPreferredSize().height));
   }
 
   public enum LabelPosition {

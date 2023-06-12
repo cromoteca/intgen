@@ -12,6 +12,7 @@ import com.vaadin.intgen.components.Checkbox;
 import com.vaadin.intgen.components.ComboBox;
 import com.vaadin.intgen.components.ComboBoxWithLeftLabel;
 import com.vaadin.intgen.components.ComboBoxWithTopLabel;
+import com.vaadin.intgen.components.FieldGroup;
 import com.vaadin.intgen.components.Grid;
 import com.vaadin.intgen.components.RadioButtonGroupHorizontal;
 import com.vaadin.intgen.components.RadioButtonGroupVertical;
@@ -197,15 +198,6 @@ public class Intgen {
       // Save as PNG
       ImageIO.write(capturedImage, "png", file);
     }
-
-    public static BufferedImage resizeImage(
-        BufferedImage originalImage, int targetWidth, int targetHeight) {
-      var resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
-      var graphics2D = resizedImage.createGraphics();
-      graphics2D.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
-      graphics2D.dispose();
-      return resizedImage;
-    }
   }
 
   public static final Random RANDOM = new Random(intConfigParam("seed"));
@@ -222,7 +214,7 @@ public class Intgen {
           new LayoutVertical(),
           new LayoutVertical(),
           new LayoutVertical());
-  public static final List<ComponentGenerator> COMPONENTS =
+  public static final List<ComponentGenerator<?>> COMPONENTS =
       List.of(
           new Button(),
           new Button(),
@@ -230,6 +222,9 @@ public class Intgen {
           new ComboBox(),
           new ComboBoxWithLeftLabel(),
           new ComboBoxWithTopLabel(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
           new Grid(),
           new RadioButtonGroupHorizontal(),
           new RadioButtonGroupVertical(),
@@ -247,14 +242,14 @@ public class Intgen {
           new TextFieldWithTopLabel(),
           new TextFieldWithTopLabel(),
           new TextFieldWithTopLabel());
-  public static final List<ComponentGenerator> OTHER_COMPONENTS =
+  public static final List<ComponentGenerator<?>> OTHER_COMPONENTS =
       List.of(new Button.DefaultButton(), new LayoutTabs.TabActive(), new LayoutTabs.Tab());
   public static final SortedSet<String> ALL =
       Stream.concat(LAYOUTS.stream(), Stream.concat(COMPONENTS.stream(), OTHER_COMPONENTS.stream()))
           .map(ComponentGenerator::getCategory)
           .collect(Collectors.toCollection(TreeSet::new));
 
-  public static <T extends ComponentGenerator> Container addChild(
+  public static <T extends ComponentGenerator<?>> Container addChild(
       Container layout, List<T> generators) {
     T generator = null;
 
@@ -303,6 +298,10 @@ public class Intgen {
 
   private static final String[] flatThemes = new String[] {"Arc Dark", "Cobalt_2", "GitHub"};
 
+  public static <T> T pickOne(T[] array) {
+    return array[RANDOM.nextInt(array.length)];
+  }
+
   public static String words(int min, int max) {
     return IntStream.rangeClosed(1, min + RANDOM.nextInt(max - min + 1))
         .mapToObj(n -> WORDS.get(RANDOM.nextInt(WORDS.size())))
@@ -316,10 +315,10 @@ public class Intgen {
   }
 
   private static final String[] emojis = {
-    "\u2705", // Check Mark
-    "\u274C", // Cross Mark
-    "\u26A0", // Warning
-    "\u2757", // Exclamation Mark
+    "✅", // Check Mark
+    "❌", // Cross Mark
+    "⚠", // Warning
+    "❗", // Exclamation Mark
     "\uD83D\uDEAB", // No Entry
     "\uD83D\uDE4F", // Clapping Hands
     "\uD83D\uDC4D", // Thumbs Up
