@@ -23,8 +23,13 @@ public class ComponentWithLabel implements ComponentGenerator<JPanel> {
     borderLayout.setHgap(Intgen.RANDOM.nextInt(10));
     borderLayout.setVgap(Intgen.RANDOM.nextInt(10));
     var panel = new JPanel(borderLayout);
-    var label =
-        new JLabel(Intgen.words(1, 3), Intgen.RANDOM.nextBoolean() ? JLabel.LEFT : JLabel.RIGHT);
+    var text = Intgen.words(1, 3);
+
+    if (Intgen.RANDOM.nextDouble() > 0.8) {
+      text += " *";
+    }
+
+    var label = new JLabel(text, Intgen.RANDOM.nextBoolean() ? JLabel.LEFT : JLabel.RIGHT);
 
     if (labelPosition == LabelPosition.LEFT) {
       sizeLabel(label);

@@ -8,15 +8,9 @@ public class Button implements ComponentGenerator<JButton> {
 
   @Override
   public JButton generate() {
-    String buttonText;
-
-    if (Intgen.RANDOM.nextBoolean()) {
-      buttonText = Intgen.emoji() + ' ' + Intgen.words(0, 2);
-    } else {
-      buttonText = Intgen.words(1, 2);
-    }
-
-    return new JButton(buttonText);
+    var icon = Intgen.RANDOM.nextDouble() > 0.8 ? Intgen.icon() : null;
+    var text = icon == null || Intgen.RANDOM.nextDouble() > 0.5 ? Intgen.words(1, 2) : null;
+    return new JButton(text, icon);
   }
 
   // dummy generator

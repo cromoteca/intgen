@@ -58,6 +58,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
@@ -218,16 +219,20 @@ public class Intgen {
       List.of(
           new Button(),
           new Button(),
+          new Button(),
+          new Button(),
+          new Button(),
+          new Button(),
+          new Checkbox(),
           new Checkbox(),
           new ComboBox(),
           new ComboBoxWithLeftLabel(),
           new ComboBoxWithTopLabel(),
-          new FieldGroup(),
-          new FieldGroup(),
+          new FieldGroup(), // contains multiple fields
           new FieldGroup(),
           new Grid(),
-          new RadioButtonGroupHorizontal(),
-          new RadioButtonGroupVertical(),
+          new RadioButtonGroupHorizontal(), // contains multiple radio buttons
+          new RadioButtonGroupVertical(), // contains multiple radio buttons
           new TextArea(),
           new TextAreaWithLeftLabel(),
           new TextAreaWithTopLabel(),
@@ -236,8 +241,6 @@ public class Intgen {
           new TextFieldWithLeftLabel(),
           new TextFieldWithLeftLabel(),
           new TextFieldWithLeftLabel(),
-          new TextFieldWithLeftLabel(),
-          new TextFieldWithTopLabel(),
           new TextFieldWithTopLabel(),
           new TextFieldWithTopLabel(),
           new TextFieldWithTopLabel(),
@@ -314,23 +317,36 @@ public class Intgen {
         .collect(Collectors.joining("\n"));
   }
 
-  private static final String[] emojis = {
-    "✅", // Check Mark
-    "❌", // Cross Mark
-    "⚠", // Warning
-    "❗", // Exclamation Mark
-    "\uD83D\uDEAB", // No Entry
-    "\uD83D\uDE4F", // Clapping Hands
-    "\uD83D\uDC4D", // Thumbs Up
-    "\uD83D\uDC4E", // Thumbs Down
-    "\uD83D\uDCD1", // File Folder
-    "\uD83D\uDCE6", // Inbox Tray
-    "\uD83D\uDCE8", // Outbox Tray
-    "\uD83D\uDCDD", // Notebook
+  private static final String[] icons = {
+    "crm_mail.gif",
+    "g_cancel.gif",
+    "g_delete.gif",
+    "g_empty.gif",
+    "g_events.gif",
+    "g_export.gif",
+    "g_help.gif",
+    "g_import.gif",
+    "g_lamp.gif",
+    "g_left.gif",
+    "g_new.gif",
+    "g_no.gif",
+    "g_open.gif",
+    "g_place.gif",
+    "g_preview.gif",
+    "g_right.gif",
+    "g_save.gif",
+    "g_search.gif",
+    "g_undo.gif",
+    "g_yes.gif",
   };
 
-  public static String emoji() {
-    return emojis[RANDOM.nextInt(emojis.length)];
+  public static ImageIcon icon() {
+    try {
+      var bufferedImage = ImageIO.read(Intgen.class.getResource("/images/" + pickOne(icons)));
+      return new ImageIcon(bufferedImage);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   private static void createAndShowGui(Phase phase, CountDownLatch latch, int imageId) {
