@@ -5,6 +5,7 @@ import com.vaadin.intgen.Intgen;
 import com.vaadin.intgen.layouts.LayoutVertical;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import javax.swing.Box;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -30,9 +31,11 @@ public class FieldGroup implements ComponentGenerator<JComponent> {
     var rows = Intgen.RANDOM.nextInt(3, 8);
     var labelAlignment = Intgen.RANDOM.nextBoolean() ? JLabel.LEFT : JLabel.RIGHT;
     var box = layoutGenerator.generate();
+    var spacing = Intgen.RANDOM.nextInt(5, 15);
 
     for (int i = 0; i < rows; i++) {
       Intgen.pickOne(generators).add(box);
+      box.add(Box.createVerticalStrut(spacing));
     }
 
     for (int i = 0; i < rows; i++) {

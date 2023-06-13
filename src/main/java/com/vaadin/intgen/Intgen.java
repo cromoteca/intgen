@@ -25,7 +25,6 @@ import com.vaadin.intgen.components.TextAreaWithTopLabel;
 import com.vaadin.intgen.components.TextField;
 import com.vaadin.intgen.components.TextFieldWithLeftLabel;
 import com.vaadin.intgen.components.TextFieldWithTopLabel;
-import com.vaadin.intgen.layouts.LayoutGrid;
 import com.vaadin.intgen.layouts.LayoutHorizontal;
 import com.vaadin.intgen.layouts.LayoutTabs;
 import com.vaadin.intgen.layouts.LayoutVertical;
@@ -209,10 +208,12 @@ public class Intgen {
   public static final Random RANDOM = new Random(intConfigParam("seed"));
   public static final List<LayoutGenerator> LAYOUTS =
       List.of(
-          new LayoutGrid(),
+          // new LayoutGrid(),
+          new LayoutHorizontal(),
           new LayoutHorizontal(),
           new LayoutHorizontal(),
           new LayoutTabs(),
+          new LayoutVertical(),
           new LayoutVertical(),
           new LayoutVertical(),
           new LayoutVertical());
