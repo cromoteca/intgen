@@ -68,6 +68,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.imgscalr.Scalr;
+import themes.Vaadin;
 
 public class Intgen {
 
@@ -274,7 +275,8 @@ public class Intgen {
             FlatIntelliJLaf.class,
             FlatLightLaf.class,
             FlatMacLightLaf.class,
-            FlatMacDarkLaf.class)
+            FlatMacDarkLaf.class,
+            Vaadin.class)
         .forEach(
             laf -> {
               UIManager.installLookAndFeel(laf.getSimpleName(), laf.getName());
