@@ -12,7 +12,7 @@ public class LayoutVertical extends LayoutGenerator {
   }
 
   @Override
-  public JComponent generateWrapper(JComponent container) {
+  public JComponent wrap(JComponent container) {
     var box = Box.createVerticalBox();
     box.add(container);
     box.add(Box.createVerticalGlue());

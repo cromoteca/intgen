@@ -10,11 +10,13 @@ import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import com.vaadin.intgen.components.Button;
 import com.vaadin.intgen.components.Checkbox;
 import com.vaadin.intgen.components.ComboBox;
+import com.vaadin.intgen.components.ComboBoxGroupHorizontal;
 import com.vaadin.intgen.components.ComboBoxWithLeftLabel;
 import com.vaadin.intgen.components.ComboBoxWithTopLabel;
 import com.vaadin.intgen.components.FieldGroup;
 import com.vaadin.intgen.components.Grid;
 import com.vaadin.intgen.components.RadioButtonGroupHorizontal;
+import com.vaadin.intgen.components.RadioButtonGroupHorizontalWithLeftLabel;
 import com.vaadin.intgen.components.RadioButtonGroupVertical;
 import com.vaadin.intgen.components.TextArea;
 import com.vaadin.intgen.components.TextAreaWithLeftLabel;
@@ -47,6 +49,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Random;
@@ -204,14 +207,10 @@ public class Intgen {
   public static final Random RANDOM = new Random(intConfigParam("seed"));
   public static final List<LayoutGenerator> LAYOUTS =
       List.of(
-          new LayoutHorizontal(),
           new LayoutGrid(),
           new LayoutHorizontal(),
           new LayoutHorizontal(),
-          new LayoutHorizontal(),
           new LayoutTabs(),
-          new LayoutVertical(),
-          new LayoutVertical(),
           new LayoutVertical(),
           new LayoutVertical(),
           new LayoutVertical());
@@ -220,29 +219,24 @@ public class Intgen {
           new Button(),
           new Button(),
           new Button(),
-          new Button(),
-          new Button(),
-          new Button(),
           new Checkbox(),
           new Checkbox(),
           new ComboBox(),
+          new ComboBoxGroupHorizontal(),
           new ComboBoxWithLeftLabel(),
           new ComboBoxWithTopLabel(),
-          new FieldGroup(), // contains multiple fields
+          new FieldGroup(),
           new FieldGroup(),
           new Grid(),
-          new RadioButtonGroupHorizontal(), // contains multiple radio buttons
-          new RadioButtonGroupVertical(), // contains multiple radio buttons
+          new RadioButtonGroupHorizontal(),
+          new RadioButtonGroupHorizontalWithLeftLabel(),
+          new RadioButtonGroupVertical(),
           new TextArea(),
           new TextAreaWithLeftLabel(),
           new TextAreaWithTopLabel(),
           new TextField(),
           new TextFieldWithLeftLabel(),
           new TextFieldWithLeftLabel(),
-          new TextFieldWithLeftLabel(),
-          new TextFieldWithLeftLabel(),
-          new TextFieldWithTopLabel(),
-          new TextFieldWithTopLabel(),
           new TextFieldWithTopLabel(),
           new TextFieldWithTopLabel());
   public static final List<ComponentGenerator<?>> OTHER_COMPONENTS =
@@ -250,6 +244,7 @@ public class Intgen {
   public static final SortedSet<String> ALL =
       Stream.concat(LAYOUTS.stream(), Stream.concat(COMPONENTS.stream(), OTHER_COMPONENTS.stream()))
           .map(ComponentGenerator::getCategory)
+          .filter(Objects::nonNull)
           .collect(Collectors.toCollection(TreeSet::new));
 
   public static <T extends ComponentGenerator<?>> Container addChild(
@@ -257,7 +252,7 @@ public class Intgen {
     T generator = null;
 
     while (generator == null) {
-      var candidate = generators.get(RANDOM.nextInt(generators.size()));
+      var candidate = pickOne(generators);
 
       if (!candidate.forbid(layout.getName())) {
         generator = candidate;
@@ -305,9 +300,13 @@ public class Intgen {
     return array[RANDOM.nextInt(array.length)];
   }
 
+  public static <T> T pickOne(List<T> list) {
+    return list.get(RANDOM.nextInt(list.size()));
+  }
+
   public static String words(int min, int max) {
     return IntStream.rangeClosed(1, min + RANDOM.nextInt(max - min + 1))
-        .mapToObj(n -> WORDS.get(RANDOM.nextInt(WORDS.size())))
+        .mapToObj(n -> pickOne(WORDS))
         .collect(Collectors.joining(" "));
   }
 
@@ -370,7 +369,7 @@ public class Intgen {
 
       var layoutCount = RANDOM.nextInt(1, intConfigParam("maxLayouts"));
       for (var i = 0; i < layoutCount; i++) {
-        var parent = layouts.get(RANDOM.nextInt(layouts.size()));
+        var parent = pickOne(layouts);
         Container layout = Intgen.addChild(parent, LAYOUTS);
         layouts.add(layout);
       }

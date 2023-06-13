@@ -34,6 +34,7 @@ public class Grid implements ComponentGenerator<JScrollPane> {
 
     var model = new DefaultTableModel(data, columnNames);
     var table = new JTable(model);
+    table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
     for (var i = 0; i < table.getColumnCount(); i++) {
       var column = table.getColumnModel().getColumn(i);

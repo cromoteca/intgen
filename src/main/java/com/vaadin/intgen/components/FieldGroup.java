@@ -21,9 +21,8 @@ public class FieldGroup implements ComponentGenerator<JComponent> {
         new TextFieldWithLeftLabel(),
         new TextFieldWithLeftLabel(),
         new TextFieldWithLeftLabel(),
-        new TextFieldWithLeftLabel(),
         new ComboBoxWithLeftLabel(),
-        new RadioButtonGroupHorizontal(),
+        new RadioButtonGroupHorizontalWithLeftLabel(),
       };
 
   @Override

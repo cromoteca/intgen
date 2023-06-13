@@ -9,7 +9,7 @@ public abstract class LayoutGenerator implements ComponentGenerator<JComponent> 
   @Override
   public JComponent add(Container parent) {
     var container = generate();
-    var wrapper = generateWrapper(container);
+    var wrapper = wrap(container);
 
     if (Intgen.RANDOM.nextDouble() > 0.8) {
       wrapper.setBorder(BorderFactory.createTitledBorder(Intgen.words(1, 3)));
@@ -23,7 +23,12 @@ public abstract class LayoutGenerator implements ComponentGenerator<JComponent> 
     return container;
   }
 
-  public JComponent generateWrapper(JComponent container) {
+  public JComponent wrap(JComponent container) {
     return container;
+  }
+
+  @Override
+  public boolean forbid(String parentCategory) {
+    return getCategory().equals(parentCategory);
   }
 }

@@ -22,7 +22,7 @@ public class LayoutTabs extends LayoutGenerator {
   }
 
   @Override
-  public JTabbedPane generateWrapper(JComponent container) {
+  public JTabbedPane wrap(JComponent container) {
     var tabbedPane = new JTabbedPane();
     var tabCount = Intgen.RANDOM.nextInt(2, 6);
     var selectedTab = Intgen.RANDOM.nextInt(tabCount);
