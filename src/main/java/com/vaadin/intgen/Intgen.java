@@ -14,6 +14,7 @@ import com.vaadin.intgen.components.ComboBoxGroupHorizontal;
 import com.vaadin.intgen.components.ComboBoxWithLeftLabel;
 import com.vaadin.intgen.components.ComboBoxWithTopLabel;
 import com.vaadin.intgen.components.FieldGroup;
+import com.vaadin.intgen.components.FreeText;
 import com.vaadin.intgen.components.Grid;
 import com.vaadin.intgen.components.RadioButtonGroupHorizontal;
 import com.vaadin.intgen.components.RadioButtonGroupHorizontalWithLeftLabel;
@@ -228,6 +229,7 @@ public class Intgen {
           new ComboBoxWithTopLabel(),
           new FieldGroup(),
           new FieldGroup(),
+          new FreeText(),
           new Grid(),
           new RadioButtonGroupHorizontal(),
           new RadioButtonGroupHorizontalWithLeftLabel(),
