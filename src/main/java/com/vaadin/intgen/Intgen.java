@@ -47,6 +47,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -289,7 +290,10 @@ public class Intgen {
             laf -> {
               UIManager.installLookAndFeel(laf.getSimpleName(), laf.getName());
             });
-    lookAndFeels = UIManager.getInstalledLookAndFeels();
+    lookAndFeels =
+        Arrays.stream(UIManager.getInstalledLookAndFeels())
+            .filter(laf -> !"CDE/Motif".equals(laf.getName()))
+            .toArray(UIManager.LookAndFeelInfo[]::new);
 
     var index = 0;
     for (var category : ALL) {
