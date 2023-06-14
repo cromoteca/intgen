@@ -16,6 +16,7 @@ import com.vaadin.intgen.components.ComboBoxWithTopLabel;
 import com.vaadin.intgen.components.FieldGroup;
 import com.vaadin.intgen.components.FreeText;
 import com.vaadin.intgen.components.Grid;
+import com.vaadin.intgen.components.RadioButton;
 import com.vaadin.intgen.components.RadioButtonGroupHorizontal;
 import com.vaadin.intgen.components.RadioButtonGroupHorizontalWithLeftLabel;
 import com.vaadin.intgen.components.RadioButtonGroupVertical;
@@ -244,7 +245,11 @@ public class Intgen {
           new TextFieldWithTopLabel(),
           new TextFieldWithTopLabel());
   public static final List<ComponentGenerator<?>> OTHER_COMPONENTS =
-      List.of(new Button.DefaultButton(), new LayoutTabs.TabActive(), new LayoutTabs.Tab());
+      List.of(
+          new Button.DefaultButton(),
+          new LayoutTabs.TabActive(),
+          new LayoutTabs.Tab(),
+          new RadioButton());
   public static final SortedSet<String> ALL =
       Stream.concat(LAYOUTS.stream(), Stream.concat(COMPONENTS.stream(), OTHER_COMPONENTS.stream()))
           .map(ComponentGenerator::getCategory)
