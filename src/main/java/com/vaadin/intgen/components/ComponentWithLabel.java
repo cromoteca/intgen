@@ -4,8 +4,11 @@ import com.vaadin.intgen.ComponentGenerator;
 import com.vaadin.intgen.Intgen;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EtchedBorder;
 
 public class ComponentWithLabel implements ComponentGenerator<JPanel> {
 
@@ -37,6 +40,12 @@ public class ComponentWithLabel implements ComponentGenerator<JPanel> {
 
     panel.add(label, labelPosition.getPosition());
     panel.add(field.generate(), BorderLayout.CENTER);
+
+    switch (Intgen.RANDOM.nextInt(20)) {
+      case 0 -> panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
+      case 1 -> panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+      case 2 -> panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
+    }
 
     return panel;
   }
