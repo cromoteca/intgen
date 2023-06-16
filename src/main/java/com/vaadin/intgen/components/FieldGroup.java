@@ -2,6 +2,7 @@ package com.vaadin.intgen.components;
 
 import com.vaadin.intgen.ComponentGenerator;
 import com.vaadin.intgen.Intgen;
+import com.vaadin.intgen.layouts.LayoutHorizontal;
 import com.vaadin.intgen.layouts.LayoutVertical;
 import java.awt.Component;
 import java.awt.Container;
@@ -20,9 +21,10 @@ import javax.swing.border.EtchedBorder;
 
 public class FieldGroup implements ComponentGenerator<JComponent> {
 
+  private final String forbiddenParent = new LayoutHorizontal().getCategory();
   private final ComponentGenerator<JComponent> layoutGenerator = new LayoutVertical();
   private final Label labelGenerator = new Label();
-  private final ComponentGenerator[] generators =
+  private final ComponentGenerator[] fieldGenerators =
       new ComponentGenerator[] {
         new TextField(),
         new TextField(),
@@ -37,8 +39,6 @@ public class FieldGroup implements ComponentGenerator<JComponent> {
     var rows = Intgen.RANDOM.nextInt(3, 8);
     var labels = new ArrayList<JLabel>(rows);
     var fields = new ArrayList<Component>(rows);
-    var labelWidth = labels.stream().mapToInt(l -> l.getPreferredSize().width).max().orElse(200);
-    var fieldWidth = fields.stream().mapToInt(l -> l.getPreferredSize().width).max().orElse(200);
 
     IntStream.range(0, rows)
         .forEach(
@@ -48,13 +48,16 @@ public class FieldGroup implements ComponentGenerator<JComponent> {
               label.setHorizontalAlignment(labelAlignment);
               labels.add(label);
 
-              var fieldGenerator = Intgen.pickOne(generators);
+              var fieldGenerator = Intgen.pickOne(fieldGenerators);
               var field = fieldGenerator.generate();
               field.setName(fieldGenerator.getCategory());
               fields.add(field);
             });
 
-    var panel = new JPanel(new GridBagLayout());
+    var labelWidth = labels.stream().mapToInt(l -> l.getPreferredSize().width).max().orElse(200);
+    var fieldWidth = fields.stream().mapToInt(f -> f.getPreferredSize().width).max().orElse(200);
+
+    var panel = layoutGenerator.generate();
 
     switch (Intgen.RANDOM.nextInt(6)) {
       case 0 -> panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
@@ -68,13 +71,18 @@ public class FieldGroup implements ComponentGenerator<JComponent> {
     constraints.insets = new Insets(5, 5, 5, 5);
 
     for (int i = 0; i < rows; i++) {
+      var row = new JPanel(new GridBagLayout());
+
       var label = labels.get(i);
       label.setPreferredSize(new Dimension(labelWidth, label.getPreferredSize().height));
-      addComponent(panel, label, constraints, 0, i);
+      addComponent(row, label, constraints, 0, i);
 
       var field = fields.get(i);
       field.setPreferredSize(new Dimension(fieldWidth, field.getPreferredSize().height));
-      addComponent(panel, field, constraints, 1, i);
+      addComponent(row, field, constraints, 1, i);
+
+      row.setName(field.getName() + "WithLeftLabel");
+      panel.add(row);
     }
 
     return panel;
@@ -87,7 +95,7 @@ public class FieldGroup implements ComponentGenerator<JComponent> {
 
   @Override
   public boolean forbid(String parentCategory) {
-    return "LayoutHorizontal".equals(parentCategory);
+    return forbiddenParent.equals(parentCategory);
   }
 
   private void addComponent(

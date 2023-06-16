@@ -238,7 +238,6 @@ public class Intgen {
           new RadioButtonGroupHorizontal(),
           new RadioButtonGroupHorizontalWithLeftLabel(),
           new RadioButtonGroupVertical(),
-          new TextArea(),
           new TextAreaWithLeftLabel(),
           new TextAreaWithTopLabel(),
           new TextField(),
@@ -252,7 +251,8 @@ public class Intgen {
           new Label(),
           new LayoutTabs.TabActive(),
           new LayoutTabs.Tab(),
-          new RadioButton());
+          new RadioButton(),
+          new TextArea());
   public static final SortedSet<String> ALL =
       Stream.concat(LAYOUTS.stream(), Stream.concat(COMPONENTS.stream(), OTHER_COMPONENTS.stream()))
           .map(ComponentGenerator::getCategory)

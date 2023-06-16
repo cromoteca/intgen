@@ -12,12 +12,12 @@ import javax.swing.border.EtchedBorder;
 
 public class ComponentWithLabel implements ComponentGenerator<JPanel> {
 
-  private final ComponentGenerator<?> field;
+  private final ComponentGenerator<?> fieldGenerator;
   private final Label labelGenerator = new Label();
   private final LabelPosition labelPosition;
 
-  public ComponentWithLabel(ComponentGenerator<?> field, LabelPosition labelPosition) {
-    this.field = field;
+  public ComponentWithLabel(ComponentGenerator<?> fieldGenerator, LabelPosition labelPosition) {
+    this.fieldGenerator = fieldGenerator;
     this.labelPosition = labelPosition;
   }
 
@@ -35,7 +35,9 @@ public class ComponentWithLabel implements ComponentGenerator<JPanel> {
     }
 
     panel.add(label, labelPosition.getPosition());
-    panel.add(field.generate(), BorderLayout.CENTER);
+    var field = fieldGenerator.generate();
+    field.setName(fieldGenerator.getCategory());
+    panel.add(field, BorderLayout.CENTER);
 
     switch (Intgen.RANDOM.nextInt(20)) {
       case 0 -> panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
@@ -48,7 +50,7 @@ public class ComponentWithLabel implements ComponentGenerator<JPanel> {
 
   @Override
   public String getCategory() {
-    return field.getCategory() + "With" + labelPosition.titleCaseName() + "Label";
+    return fieldGenerator.getCategory() + "With" + labelPosition.titleCaseName() + "Label";
   }
 
   protected void sizeLabel(JLabel label) {
