@@ -1,11 +1,8 @@
 package com.vaadin.intgen;
 
-import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.IntelliJTheme;
-import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import com.vaadin.intgen.components.Button;
 import com.vaadin.intgen.components.Checkbox;
@@ -70,7 +67,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.imgscalr.Scalr;
-import themes.Vaadin;
 
 public class Intgen {
 
@@ -232,6 +228,42 @@ public class Intgen {
           new ComboBoxWithTopLabel(),
           new FieldGroup(),
           new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
+          new FieldGroup(),
           new FreeText(),
           new Grid(),
           new RadioButtonGroupHorizontal(),
@@ -269,7 +301,7 @@ public class Intgen {
       }
     }
 
-    return generator.add(layout);
+    return generator.add(layout).addedContainer();
   }
 
   private static final Map<String, Integer> categoryMap = new HashMap<>();
@@ -279,13 +311,12 @@ public class Intgen {
 
   static {
     Stream.of(
-            FlatDarculaLaf.class,
-            FlatDarkLaf.class,
-            FlatIntelliJLaf.class,
-            FlatLightLaf.class,
-            FlatMacLightLaf.class,
-            FlatMacDarkLaf.class,
-            Vaadin.class)
+            // FlatDarculaLaf.class,
+            // FlatDarkLaf.class,
+            FlatIntelliJLaf.class, FlatLightLaf.class, FlatMacLightLaf.class
+            // FlatMacDarkLaf.class,
+            // Vaadin.class
+            )
         .forEach(
             laf -> {
               UIManager.installLookAndFeel(laf.getSimpleName(), laf.getName());
@@ -308,7 +339,11 @@ public class Intgen {
     }
   }
 
-  private static final String[] flatThemes = new String[] {"Arc Dark", "Cobalt_2", "GitHub"};
+  private static final String[] flatThemes =
+      new String[] {
+        /* "Arc Dark", "Cobalt_2", */
+        "GitHub"
+      };
 
   public static <T> T pickOne(T[] array) {
     return array[RANDOM.nextInt(array.length)];

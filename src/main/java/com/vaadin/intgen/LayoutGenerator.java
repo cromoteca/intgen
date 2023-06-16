@@ -7,7 +7,7 @@ import javax.swing.JComponent;
 public abstract class LayoutGenerator implements ComponentGenerator<JComponent> {
 
   @Override
-  public JComponent add(Container parent) {
+  public Added<JComponent> add(Container parent) {
     var container = generate();
     var wrapper = wrap(container);
 
@@ -20,7 +20,7 @@ public abstract class LayoutGenerator implements ComponentGenerator<JComponent> 
 
     container.setName(getCategory());
     parent.add(wrapper, Intgen.RANDOM.nextInt(-1, parent.getComponentCount()));
-    return container;
+    return new Added<>(wrapper, container);
   }
 
   public JComponent wrap(JComponent container) {

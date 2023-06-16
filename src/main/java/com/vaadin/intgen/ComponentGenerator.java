@@ -6,13 +6,13 @@ import javax.swing.JComponent;
 
 public interface ComponentGenerator<T extends Component> {
 
-  default Container add(Container parent) {
+  default Added<T> add(Container parent) {
     var component = generate();
     component.setMaximumSize(component.getPreferredSize());
     component.setName(getCategory());
     ((JComponent) component).setAlignmentX(0);
     parent.add(component, Intgen.RANDOM.nextInt(-1, parent.getComponentCount()));
-    return null;
+    return new Added<>(component, null);
   }
 
   T generate();
@@ -24,4 +24,6 @@ public interface ComponentGenerator<T extends Component> {
   default boolean forbid(String parentCategory) {
     return false;
   }
+
+  public record Added<T>(T added, JComponent addedContainer) {}
 }
