@@ -5,12 +5,14 @@ import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.IntelliJTheme;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import com.vaadin.intgen.components.Button;
+import com.vaadin.intgen.components.ButtonBar;
 import com.vaadin.intgen.components.Checkbox;
 import com.vaadin.intgen.components.ComboBox;
 import com.vaadin.intgen.components.ComboBoxGroupHorizontal;
 import com.vaadin.intgen.components.ComboBoxWithLeftLabel;
 import com.vaadin.intgen.components.ComboBoxWithTopLabel;
 import com.vaadin.intgen.components.FieldGroup;
+import com.vaadin.intgen.components.Form;
 import com.vaadin.intgen.components.FreeText;
 import com.vaadin.intgen.components.Grid;
 import com.vaadin.intgen.components.Label;
@@ -219,20 +221,14 @@ public class Intgen {
   public static final List<ComponentGenerator<?>> COMPONENTS =
       List.of(
           new Button(),
-          new Button(),
-          new Button(),
-          new Checkbox(),
+          new ButtonBar(),
           new Checkbox(),
           new ComboBox(),
           new ComboBoxGroupHorizontal(),
           new ComboBoxWithLeftLabel(),
           new ComboBoxWithTopLabel(),
           new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
+          new Form(),
           new FreeText(),
           new Grid(),
           new RadioButtonGroupHorizontal(),
@@ -240,10 +236,8 @@ public class Intgen {
           new RadioButtonGroupVertical(),
           new TextAreaWithLeftLabel(),
           new TextAreaWithTopLabel(),
-          new TextField(),
+          new TextField(50, 500),
           new TextFieldWithLeftLabel(),
-          new TextFieldWithLeftLabel(),
-          new TextFieldWithTopLabel(),
           new TextFieldWithTopLabel());
   public static final List<ComponentGenerator<?>> OTHER_COMPONENTS =
       List.of(

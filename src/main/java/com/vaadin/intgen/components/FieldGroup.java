@@ -2,7 +2,6 @@ package com.vaadin.intgen.components;
 
 import com.vaadin.intgen.ComponentGenerator;
 import com.vaadin.intgen.Intgen;
-import com.vaadin.intgen.layouts.LayoutHorizontal;
 import com.vaadin.intgen.layouts.LayoutVertical;
 import java.awt.Component;
 import java.awt.Container;
@@ -21,7 +20,7 @@ import javax.swing.border.EtchedBorder;
 
 public class FieldGroup implements ComponentGenerator<JComponent> {
 
-  private final String forbiddenParent = new LayoutHorizontal().getCategory();
+  // private final String forbiddenParent = new LayoutHorizontal().getCategory();
   private final ComponentGenerator<JComponent> layoutGenerator = new LayoutVertical();
   private final Label labelGenerator = new Label();
   private final ComponentGenerator[] fieldGenerators =
@@ -93,10 +92,10 @@ public class FieldGroup implements ComponentGenerator<JComponent> {
     return layoutGenerator.getCategory();
   }
 
-  @Override
-  public boolean forbid(String parentCategory) {
-    return forbiddenParent.equals(parentCategory);
-  }
+  // @Override
+  // public boolean forbid(String parentCategory) {
+  //   return forbiddenParent.equals(parentCategory);
+  // }
 
   private void addComponent(
       Container container,
