@@ -13,6 +13,7 @@ import javax.swing.border.EtchedBorder;
 public class ComponentWithLabel implements ComponentGenerator<JPanel> {
 
   private final ComponentGenerator<?> field;
+  private final Label labelGenerator = new Label();
   private final LabelPosition labelPosition;
 
   public ComponentWithLabel(ComponentGenerator<?> field, LabelPosition labelPosition) {
@@ -26,13 +27,8 @@ public class ComponentWithLabel implements ComponentGenerator<JPanel> {
     borderLayout.setHgap(Intgen.RANDOM.nextInt(10));
     borderLayout.setVgap(Intgen.RANDOM.nextInt(10));
     var panel = new JPanel(borderLayout);
-    var text = Intgen.words(1, 3);
-
-    if (Intgen.RANDOM.nextDouble() > 0.8) {
-      text += " *";
-    }
-
-    var label = new JLabel(text, Intgen.RANDOM.nextBoolean() ? JLabel.LEFT : JLabel.RIGHT);
+    var label = labelGenerator.generate();
+    label.setName(labelGenerator.getCategory());
 
     if (labelPosition == LabelPosition.LEFT) {
       sizeLabel(label);

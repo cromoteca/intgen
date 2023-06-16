@@ -12,6 +12,11 @@ public class TextField implements ComponentGenerator<JTextField> {
     var textField = new JTextField();
     textField.setPreferredSize(new Dimension(100, textField.getPreferredSize().height));
     textField.setText(Intgen.words(0, 3));
+
+    if (Intgen.RANDOM.nextDouble() > 0.8) {
+      textField.setEditable(false);
+    }
+
     return textField;
   }
 }

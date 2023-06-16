@@ -13,6 +13,7 @@ import com.vaadin.intgen.components.ComboBoxWithTopLabel;
 import com.vaadin.intgen.components.FieldGroup;
 import com.vaadin.intgen.components.FreeText;
 import com.vaadin.intgen.components.Grid;
+import com.vaadin.intgen.components.Label;
 import com.vaadin.intgen.components.RadioButton;
 import com.vaadin.intgen.components.RadioButtonGroupHorizontal;
 import com.vaadin.intgen.components.RadioButtonGroupHorizontalWithLeftLabel;
@@ -232,38 +233,6 @@ public class Intgen {
           new FieldGroup(),
           new FieldGroup(),
           new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
-          new FieldGroup(),
           new FreeText(),
           new Grid(),
           new RadioButtonGroupHorizontal(),
@@ -280,6 +249,7 @@ public class Intgen {
   public static final List<ComponentGenerator<?>> OTHER_COMPONENTS =
       List.of(
           new Button.DefaultButton(),
+          new Label(),
           new LayoutTabs.TabActive(),
           new LayoutTabs.Tab(),
           new RadioButton());

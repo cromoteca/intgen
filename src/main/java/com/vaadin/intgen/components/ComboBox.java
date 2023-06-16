@@ -8,6 +8,16 @@ public class ComboBox implements ComponentGenerator<JComboBox> {
 
   @Override
   public JComboBox generate() {
-    return new JComboBox<>(new String[] {Intgen.words(1, 4)});
+    var combo = new JComboBox<>(new String[] {Intgen.words(1, 4)});
+
+    if (Intgen.RANDOM.nextDouble() > 0.8) {
+      combo.setSelectedIndex(0);
+    }
+
+    if (Intgen.RANDOM.nextDouble() > 0.8) {
+      combo.setEditable(false);
+    }
+
+    return combo;
   }
 }
