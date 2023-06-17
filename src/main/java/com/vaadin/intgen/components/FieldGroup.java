@@ -22,7 +22,7 @@ public class FieldGroup implements ComponentGenerator<JComponent> {
 
   // private final String forbiddenParent = new LayoutHorizontal().getCategory();
   private final ComponentGenerator<JComponent> layoutGenerator = new LayoutVertical();
-  private final Label labelGenerator = new Label();
+  private final Label labelGenerator = new Label(Intgen.RANDOM.nextDouble() > 0.7);
   private final ComponentGenerator[] fieldGenerators =
       new ComponentGenerator[] {
         new TextField(),

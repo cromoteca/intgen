@@ -223,7 +223,7 @@ public class Intgen {
           new Button(),
           new ButtonBar(),
           new Checkbox(),
-          new ComboBox(),
+          new ComboBox(50, 500),
           new ComboBoxGroupHorizontal(),
           new ComboBoxWithLeftLabel(),
           new ComboBoxWithTopLabel(),
