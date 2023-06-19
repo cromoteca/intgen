@@ -1,5 +1,4 @@
 /target/
-/runs/
 yolo*.pt
 /intgen.properties
 .idea/

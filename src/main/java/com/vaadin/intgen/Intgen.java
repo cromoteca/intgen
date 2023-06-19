@@ -105,6 +105,16 @@ public class Intgen {
       out.println();
       out.println("nc: " + ALL.size());
       out.println("names: [" + names + "]");
+      out.println();
+
+      var i = 0;
+
+      for (var cat : ALL) {
+        out.print("# ");
+        out.print(i++);
+        out.print('\t');
+        out.println(cat);
+      }
     }
   }
 
