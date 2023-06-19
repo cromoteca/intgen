@@ -19,7 +19,7 @@ public class ComboBox implements ComponentGenerator<JComboBox> {
 
   @Override
   public JComboBox generate() {
-    var combo = new JComboBox<>(new String[] {Intgen.words(1, 4)});
+    var combo = new JComboBox<>(new String[] {Intgen.words(0, 3)});
     combo.setPreferredSize(
         new java.awt.Dimension(
             Intgen.RANDOM.nextInt(minWidth, maxWidth), combo.getPreferredSize().height));
