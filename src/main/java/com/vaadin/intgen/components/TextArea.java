@@ -13,7 +13,7 @@ public class TextArea implements ComponentGenerator<JTextArea> {
     var w = Intgen.RANDOM.nextInt(100, 200);
     var h = Intgen.RANDOM.nextInt(30, Math.min(w - 40, 100));
     textArea.setPreferredSize(new Dimension(w, h));
-    textArea.setText(Intgen.wordLines(0, 4, 6));
+    textArea.setText(Intgen.wordLines(0, 4, 8));
 
     return textArea;
   }
