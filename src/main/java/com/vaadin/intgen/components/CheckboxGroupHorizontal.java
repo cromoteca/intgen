@@ -5,8 +5,8 @@ import com.vaadin.intgen.Intgen;
 import com.vaadin.intgen.layouts.LayoutHorizontal;
 import javax.swing.Box;
 
-public class ComboBoxGroupHorizontal implements ComponentGenerator<Box> {
-  private final ComboBox generator = new ComboBox();
+public class CheckboxGroupHorizontal implements ComponentGenerator<Box> {
+  private final Checkbox generator = new Checkbox();
   private static final LayoutHorizontal layout = new LayoutHorizontal();
 
   @Override

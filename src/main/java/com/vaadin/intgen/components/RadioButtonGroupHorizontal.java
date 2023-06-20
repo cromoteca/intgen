@@ -13,7 +13,7 @@ public class RadioButtonGroupHorizontal implements ComponentGenerator<Box> {
   @Override
   public Box generate() {
     var box = layout.generate();
-    var count = Intgen.RANDOM.nextInt(2, 3);
+    var count = Intgen.RANDOM.nextInt(2, 4);
     var selected = Intgen.RANDOM.nextInt(-1, count);
 
     for (int i = 0; i < count; i++) {

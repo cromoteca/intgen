@@ -7,6 +7,8 @@ import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import com.vaadin.intgen.components.Button;
 import com.vaadin.intgen.components.ButtonBar;
 import com.vaadin.intgen.components.Checkbox;
+import com.vaadin.intgen.components.CheckboxGroupHorizontal;
+import com.vaadin.intgen.components.CheckboxGroupVertical;
 import com.vaadin.intgen.components.ComboBox;
 import com.vaadin.intgen.components.ComboBoxGroupHorizontal;
 import com.vaadin.intgen.components.ComboBoxWithLeftLabel;
@@ -233,6 +235,8 @@ public class Intgen {
           new Button(),
           new ButtonBar(),
           new Checkbox(),
+          new CheckboxGroupHorizontal(),
+          new CheckboxGroupVertical(),
           new ComboBox(50, 500),
           new ComboBoxGroupHorizontal(),
           new ComboBoxWithLeftLabel(),

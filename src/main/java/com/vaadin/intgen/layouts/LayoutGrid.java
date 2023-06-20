@@ -11,7 +11,7 @@ public class LayoutGrid extends LayoutGenerator {
 
   @Override
   public JComponent generate() {
-    var layout = new GridLayout(Intgen.RANDOM.nextInt(3, 5), Intgen.RANDOM.nextInt(3, 5));
+    var layout = new GridLayout(Intgen.RANDOM.nextInt(2, 5), Intgen.RANDOM.nextInt(3, 5));
     var panel = new JPanel();
     panel.setLayout(layout);
     return panel;
