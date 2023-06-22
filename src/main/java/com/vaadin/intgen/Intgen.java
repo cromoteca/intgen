@@ -233,6 +233,7 @@ public class Intgen {
   public static final List<ComponentGenerator<?>> COMPONENTS =
       List.of(
           new Button(),
+          new Button(2.0),
           new ButtonBar(),
           new Checkbox(),
           new CheckboxGroupHorizontal(),
