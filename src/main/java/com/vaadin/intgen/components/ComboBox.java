@@ -9,7 +9,7 @@ public class ComboBox implements ComponentGenerator<JComboBox> {
   private final int maxWidth;
 
   public ComboBox() {
-    this(100, 250);
+    this(80, 250);
   }
 
   public ComboBox(int minWidth, int maxWidth) {

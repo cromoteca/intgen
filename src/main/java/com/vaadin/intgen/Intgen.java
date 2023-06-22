@@ -237,7 +237,7 @@ public class Intgen {
           new Checkbox(),
           new CheckboxGroupHorizontal(),
           new CheckboxGroupVertical(),
-          new ComboBox(50, 500),
+          new ComboBox(40, 600),
           new ComboBoxGroupHorizontal(),
           new ComboBoxWithLeftLabel(),
           new ComboBoxWithTopLabel(),
@@ -250,7 +250,7 @@ public class Intgen {
           new RadioButtonGroupVertical(),
           new TextAreaWithLeftLabel(),
           new TextAreaWithTopLabel(),
-          new TextField(50, 500),
+          new TextField(30, 600),
           new TextFieldWithLeftLabel(),
           new TextFieldWithTopLabel());
   public static final List<ComponentGenerator<?>> OTHER_COMPONENTS =

@@ -35,7 +35,7 @@ public class TextField implements ComponentGenerator<JTextField> {
       };
 
   public TextField() {
-    this(100, 250);
+    this(75, 250);
   }
 
   public TextField(int minWidth, int maxWidth) {
