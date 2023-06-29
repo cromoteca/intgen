@@ -1,8 +1,14 @@
 package com.vaadin.intgen;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.formdev.flatlaf.FlatDarculaLaf;
+import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.IntelliJTheme;
+import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import com.vaadin.intgen.components.Button;
 import com.vaadin.intgen.components.ButtonBar;
@@ -28,6 +34,7 @@ import com.vaadin.intgen.components.TextAreaWithTopLabel;
 import com.vaadin.intgen.components.TextField;
 import com.vaadin.intgen.components.TextFieldWithLeftLabel;
 import com.vaadin.intgen.components.TextFieldWithTopLabel;
+import com.vaadin.intgen.layouts.LayoutGrid;
 import com.vaadin.intgen.layouts.LayoutHorizontal;
 import com.vaadin.intgen.layouts.LayoutTabs;
 import com.vaadin.intgen.layouts.LayoutVertical;
@@ -72,6 +79,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import org.imgscalr.Scalr;
+import themes.Vaadin;
 
 public class Intgen {
 
@@ -118,7 +126,15 @@ public class Intgen {
         out.println(cat);
       }
     }
+
+    objectMapper.writeValue(new File(DATASET, "_annotations.coco.json"), rootNode);
   }
+
+  private static final ObjectMapper objectMapper = new ObjectMapper();
+  private static final ObjectNode rootNode = objectMapper.createObjectNode();
+  private static final ArrayNode images = rootNode.putArray("images");
+  private static final ArrayNode annotations = rootNode.putArray("annotations");
+  private static final ArrayNode categories = rootNode.putArray("categories");
 
   public static final Properties CONFIG = new Properties();
 
@@ -201,8 +217,6 @@ public class Intgen {
     private void takeScreenshot(File file, Component frame) throws IOException {
       var image =
           new BufferedImage(frame.getWidth(), frame.getHeight(), BufferedImage.TYPE_INT_RGB);
-      // call the Component's paint method, using
-      // the Graphics object l the image.
       frame.paint(image.getGraphics());
       var capturedImage = image;
 
@@ -213,15 +227,20 @@ public class Intgen {
                 capturedImage, Scalr.Mode.FIT_EXACT, imageSize, imageSize, Scalr.OP_ANTIALIAS);
       }
 
-      // Save as PNG
       ImageIO.write(capturedImage, "png", file);
+
+      var imageNode = images.addObject();
+      imageNode.put("id", imageId);
+      imageNode.put("width", capturedImage.getWidth());
+      imageNode.put("height", capturedImage.getHeight());
+      imageNode.put("file_name", file.getName());
     }
   }
 
   public static final Random RANDOM = new Random(intConfigParam("seed"));
   public static final List<LayoutGenerator> LAYOUTS =
       List.of(
-          // new LayoutGrid(),
+          new LayoutGrid(),
           new LayoutHorizontal(),
           new LayoutHorizontal(),
           new LayoutHorizontal(),
@@ -290,12 +309,13 @@ public class Intgen {
 
   static {
     Stream.of(
-            // FlatDarculaLaf.class,
-            // FlatDarkLaf.class,
-            FlatIntelliJLaf.class, FlatLightLaf.class, FlatMacLightLaf.class
-            // FlatMacDarkLaf.class,
-            // Vaadin.class
-            )
+            FlatDarculaLaf.class,
+            FlatDarkLaf.class,
+            FlatIntelliJLaf.class,
+            FlatLightLaf.class,
+            FlatMacLightLaf.class,
+            FlatMacDarkLaf.class,
+            Vaadin.class)
         .forEach(
             laf -> {
               UIManager.installLookAndFeel(laf.getSimpleName(), laf.getName());
@@ -307,6 +327,11 @@ public class Intgen {
 
     var index = 0;
     for (var category : ALL) {
+      var categoryNode = categories.addObject();
+      categoryNode.put("supercategory", "Boxes");
+      categoryNode.put("id", index);
+      categoryNode.put("name", category);
+
       categoryMap.put(category, index++);
     }
 
@@ -318,11 +343,7 @@ public class Intgen {
     }
   }
 
-  private static final String[] flatThemes =
-      new String[] {
-        /* "Arc Dark", "Cobalt_2", */
-        "GitHub"
-      };
+  private static final String[] flatThemes = new String[] {"Arc Dark", "Cobalt_2", "GitHub"};
 
   public static <T> T pickOne(T[] array) {
     return array[RANDOM.nextInt(array.length)];
@@ -448,10 +469,27 @@ public class Intgen {
     }
   }
 
+  private static int idCounter = 0;
+
   private static void labelComponent(PrintWriter out, Component component, Component relativeTo) {
     var categoryId = categoryMap.get(component.getName());
 
     if (categoryId != null) {
+      var position = SwingUtilities.convertPoint(component, 0, 0, relativeTo);
+      var size = component.getSize();
+      float area = size.width * size.height;
+
+      var componentDetails = annotations.addObject();
+      componentDetails.put("image_id", 123);
+      componentDetails.put("id", idCounter++);
+      var bbox = componentDetails.putArray("bbox");
+      bbox.add(position.x);
+      bbox.add(position.y);
+      bbox.add(size.width);
+      bbox.add(size.height);
+      componentDetails.put("area", area);
+      componentDetails.put("category_id", categoryId);
+
       var bounds = getRelativeBounds(component, relativeTo);
       // normalize coordinates and size to be between 0 and 1
       var x = bounds.getX() / relativeTo.getWidth();
@@ -477,5 +515,15 @@ public class Intgen {
     var relativeY = innerLocation.y - outerLocation.y + innerBounds.height / 2;
 
     return new Rectangle(relativeX, relativeY, innerBounds.width, innerBounds.height);
+  }
+
+  public static void writeJsonToFile(List<ObjectNode> componentDetailsList, String filePath) {
+    try {
+      objectMapper
+          .writerWithDefaultPrettyPrinter()
+          .writeValue(new File(filePath), componentDetailsList);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
   }
 }
