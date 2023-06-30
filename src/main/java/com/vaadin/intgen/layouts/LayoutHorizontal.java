@@ -1,8 +1,7 @@
 package com.vaadin.intgen.layouts;
 
 import com.vaadin.intgen.LayoutGenerator;
-import javax.swing.Box;
-import javax.swing.JComponent;
+import javax.swing.*;
 
 public class LayoutHorizontal extends LayoutGenerator {
 

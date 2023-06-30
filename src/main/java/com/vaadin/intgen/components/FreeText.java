@@ -1,8 +1,8 @@
 package com.vaadin.intgen.components;
 
 import com.vaadin.intgen.ComponentGenerator;
-import com.vaadin.intgen.Intgen;
-import javax.swing.JLabel;
+import com.vaadin.intgen.Randoms;
+import javax.swing.*;
 
 public class FreeText implements ComponentGenerator<JLabel> {
 
@@ -10,11 +10,11 @@ public class FreeText implements ComponentGenerator<JLabel> {
 
   @Override
   public JLabel generate() {
-    var tag = Intgen.pickOne(TAGS);
+    var tag = Randoms.pickOne(TAGS);
     var text =
         String.format(
             "<html><body style='width: %dpx'><%s>%s</%s></body></html>",
-            Intgen.RANDOM.nextInt(100, 250), tag, Intgen.words(4, 15), tag);
+            Randoms.nextInt(100, 250), tag, Randoms.words(4, 15), tag);
     return new JLabel(text);
   }
 }

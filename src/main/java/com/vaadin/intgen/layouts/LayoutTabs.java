@@ -1,13 +1,10 @@
 package com.vaadin.intgen.layouts;
 
 import com.vaadin.intgen.ComponentGenerator;
-import com.vaadin.intgen.Intgen;
 import com.vaadin.intgen.LayoutGenerator;
-import java.awt.Dimension;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
+import com.vaadin.intgen.Randoms;
+import java.awt.*;
+import javax.swing.*;
 
 public class LayoutTabs extends LayoutGenerator {
 
@@ -18,14 +15,14 @@ public class LayoutTabs extends LayoutGenerator {
 
   @Override
   public JComponent generate() {
-    return (Intgen.RANDOM.nextBoolean() ? HORIZONTAL_LAYOUT : VERTICAL_LAYOUT).generate();
+    return (Randoms.nextBoolean() ? HORIZONTAL_LAYOUT : VERTICAL_LAYOUT).generate();
   }
 
   @Override
   public JTabbedPane wrap(JComponent container) {
     var tabbedPane = new JTabbedPane();
-    var tabCount = Intgen.RANDOM.nextInt(2, 6);
-    var selectedTab = Intgen.RANDOM.nextInt(tabCount);
+    var tabCount = Randoms.nextInt(2, 6);
+    var selectedTab = Randoms.nextInt(tabCount);
 
     for (int i = 0; i < tabCount; i++) {
       var component = i == selectedTab ? container : new JPanel();
@@ -47,7 +44,7 @@ public class LayoutTabs extends LayoutGenerator {
 
     @Override
     public JLabel generate() {
-      return new JLabel(Intgen.words(1, 2));
+      return new JLabel(Randoms.words(1, 2));
     }
   }
 
@@ -55,7 +52,7 @@ public class LayoutTabs extends LayoutGenerator {
 
     @Override
     public JLabel generate() {
-      return new JLabel(Intgen.words(1, 2));
+      return new JLabel(Randoms.words(1, 2));
     }
   }
 }

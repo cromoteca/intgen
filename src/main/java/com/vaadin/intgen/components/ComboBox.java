@@ -1,8 +1,8 @@
 package com.vaadin.intgen.components;
 
 import com.vaadin.intgen.ComponentGenerator;
-import com.vaadin.intgen.Intgen;
-import javax.swing.JComboBox;
+import com.vaadin.intgen.Randoms;
+import javax.swing.*;
 
 public class ComboBox implements ComponentGenerator<JComboBox> {
   private final int minWidth;
@@ -19,16 +19,16 @@ public class ComboBox implements ComponentGenerator<JComboBox> {
 
   @Override
   public JComboBox generate() {
-    var combo = new JComboBox<>(new String[] {Intgen.words(0, 6)});
+    var combo = new JComboBox<>(new String[] {Randoms.words(0, 6)});
     combo.setPreferredSize(
         new java.awt.Dimension(
-            Intgen.RANDOM.nextInt(minWidth, maxWidth), combo.getPreferredSize().height));
+            Randoms.nextInt(minWidth, maxWidth), combo.getPreferredSize().height));
 
-    if (Intgen.RANDOM.nextDouble() > 0.8) {
+    if (Randoms.nextDouble() > 0.8) {
       combo.setSelectedIndex(0);
     }
 
-    if (Intgen.RANDOM.nextDouble() > 0.8) {
+    if (Randoms.nextDouble() > 0.8) {
       combo.setEditable(false);
     }
 

@@ -1,9 +1,9 @@
 package com.vaadin.intgen.components;
 
 import com.vaadin.intgen.ComponentGenerator;
-import com.vaadin.intgen.Intgen;
+import com.vaadin.intgen.Randoms;
 import com.vaadin.intgen.layouts.LayoutHorizontal;
-import javax.swing.Box;
+import javax.swing.*;
 
 public class CheckboxGroupHorizontal implements ComponentGenerator<Box> {
   private final Checkbox generator = new Checkbox();
@@ -12,7 +12,7 @@ public class CheckboxGroupHorizontal implements ComponentGenerator<Box> {
   @Override
   public Box generate() {
     var box = layout.generate();
-    var count = Intgen.RANDOM.nextInt(2, 4);
+    var count = Randoms.nextInt(2, 4);
 
     for (int i = 0; i < count; i++) {
       generator.add(box);

@@ -1,10 +1,10 @@
 package com.vaadin.intgen.components;
 
 import com.vaadin.intgen.ComponentGenerator;
-import com.vaadin.intgen.Intgen;
-import java.awt.Dimension;
+import com.vaadin.intgen.Randoms;
+import java.awt.*;
 import java.util.function.Supplier;
-import javax.swing.JTextField;
+import javax.swing.*;
 import net.datafaker.Faker;
 
 public class TextField implements ComponentGenerator<JTextField> {
@@ -47,16 +47,15 @@ public class TextField implements ComponentGenerator<JTextField> {
   public JTextField generate() {
     var textField = new JTextField();
     textField.setPreferredSize(
-        new Dimension(
-            Intgen.RANDOM.nextInt(minWidth, maxWidth), textField.getPreferredSize().height));
+        new Dimension(Randoms.nextInt(minWidth, maxWidth), textField.getPreferredSize().height));
 
-    if (Intgen.RANDOM.nextBoolean()) {
-      textField.setText(Intgen.pickOne(text).get());
+    if (Randoms.nextBoolean()) {
+      textField.setText(Randoms.pickOne(text).get());
     } else {
-      textField.setText(Intgen.words(0, 6));
+      textField.setText(Randoms.words(0, 6));
     }
 
-    if (Intgen.RANDOM.nextDouble() > 0.8) {
+    if (Randoms.nextDouble() > 0.8) {
       textField.setEditable(false);
     }
 

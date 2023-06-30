@@ -1,8 +1,7 @@
 package com.vaadin.intgen;
 
-import java.awt.Container;
-import javax.swing.BorderFactory;
-import javax.swing.JComponent;
+import java.awt.*;
+import javax.swing.*;
 
 public abstract class LayoutGenerator implements ComponentGenerator<JComponent> {
 
@@ -11,15 +10,15 @@ public abstract class LayoutGenerator implements ComponentGenerator<JComponent> 
     var container = generate();
     var wrapper = wrap(container);
 
-    if (Intgen.RANDOM.nextDouble() > 0.8) {
-      wrapper.setBorder(BorderFactory.createTitledBorder(Intgen.words(1, 3)));
+    if (Randoms.nextDouble() > 0.8) {
+      wrapper.setBorder(BorderFactory.createTitledBorder(Randoms.words(1, 3)));
     } else {
-      var padding = Intgen.RANDOM.nextInt(10);
+      var padding = Randoms.nextInt(10);
       wrapper.setBorder(BorderFactory.createEmptyBorder(padding, padding, padding, padding));
     }
 
     container.setName(getCategory());
-    parent.add(wrapper, Intgen.RANDOM.nextInt(-1, parent.getComponentCount()));
+    parent.add(wrapper, Randoms.nextInt(-1, parent.getComponentCount()));
     return new Added<>(wrapper, container);
   }
 

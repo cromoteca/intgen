@@ -1,8 +1,7 @@
 package com.vaadin.intgen;
 
-import java.awt.Component;
-import java.awt.Container;
-import javax.swing.JComponent;
+import java.awt.*;
+import javax.swing.*;
 
 public interface ComponentGenerator<T extends Component> {
 
@@ -11,7 +10,7 @@ public interface ComponentGenerator<T extends Component> {
     component.setMaximumSize(component.getPreferredSize());
     component.setName(getCategory());
     ((JComponent) component).setAlignmentX(0);
-    parent.add(component, Intgen.RANDOM.nextInt(-1, parent.getComponentCount()));
+    parent.add(component, Randoms.nextInt(-1, parent.getComponentCount()));
     return new Added<>(component, null);
   }
 

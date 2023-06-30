@@ -1,10 +1,9 @@
 package com.vaadin.intgen.components;
 
 import com.vaadin.intgen.ComponentGenerator;
-import com.vaadin.intgen.Intgen;
+import com.vaadin.intgen.Randoms;
 import com.vaadin.intgen.layouts.LayoutHorizontal;
-import javax.swing.Box;
-import javax.swing.JComponent;
+import javax.swing.*;
 
 public class ButtonBar implements ComponentGenerator<JComponent> {
 
@@ -13,10 +12,10 @@ public class ButtonBar implements ComponentGenerator<JComponent> {
 
   @Override
   public JComponent generate() {
-    var count = Intgen.RANDOM.nextInt(2, 6);
-    var separatorIndex = Intgen.RANDOM.nextInt(count);
-    var padding = Intgen.RANDOM.nextInt(0, 10);
-    var separatorWidth = Intgen.RANDOM.nextInt(50, 150);
+    var count = Randoms.nextInt(2, 6);
+    var separatorIndex = Randoms.nextInt(count);
+    var padding = Randoms.nextInt(0, 10);
+    var separatorWidth = Randoms.nextInt(50, 150);
 
     var layout = layoutGenerator.generate();
 

@@ -1,12 +1,9 @@
 package com.vaadin.intgen.components;
 
 import com.vaadin.intgen.ComponentGenerator;
-import com.vaadin.intgen.Intgen;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import com.vaadin.intgen.Randoms;
+import java.awt.*;
+import javax.swing.*;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EtchedBorder;
 
@@ -24,8 +21,8 @@ public class ComponentWithLabel implements ComponentGenerator<JPanel> {
   @Override
   public JPanel generate() {
     var borderLayout = new BorderLayout();
-    borderLayout.setHgap(Intgen.RANDOM.nextInt(10));
-    borderLayout.setVgap(Intgen.RANDOM.nextInt(10));
+    borderLayout.setHgap(Randoms.nextInt(10));
+    borderLayout.setVgap(Randoms.nextInt(10));
     var panel = new JPanel(borderLayout);
     var label = labelGenerator.generate();
     label.setName(labelGenerator.getCategory());
@@ -39,7 +36,7 @@ public class ComponentWithLabel implements ComponentGenerator<JPanel> {
     field.setName(fieldGenerator.getCategory());
     panel.add(field, BorderLayout.CENTER);
 
-    switch (Intgen.RANDOM.nextInt(20)) {
+    switch (Randoms.nextInt(20)) {
       case 0 -> panel.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
       case 1 -> panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
       case 2 -> panel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.RAISED));
@@ -56,7 +53,7 @@ public class ComponentWithLabel implements ComponentGenerator<JPanel> {
   protected void sizeLabel(JLabel label) {
     label.setPreferredSize(
         new Dimension(
-            label.getPreferredSize().width + Intgen.RANDOM.nextInt(100),
+            label.getPreferredSize().width + Randoms.nextInt(100),
             label.getPreferredSize().height));
   }
 
@@ -75,7 +72,7 @@ public class ComponentWithLabel implements ComponentGenerator<JPanel> {
     }
 
     public String titleCaseName() {
-      return name().substring(0, 1) + name().substring(1).toLowerCase();
+      return name().charAt(0) + name().substring(1).toLowerCase();
     }
   }
 }

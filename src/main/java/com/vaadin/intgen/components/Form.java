@@ -1,10 +1,10 @@
 package com.vaadin.intgen.components;
 
 import com.vaadin.intgen.ComponentGenerator;
-import com.vaadin.intgen.Intgen;
+import com.vaadin.intgen.Randoms;
 import com.vaadin.intgen.layouts.LayoutHorizontal;
 import com.vaadin.intgen.layouts.LayoutVertical;
-import javax.swing.JComponent;
+import javax.swing.*;
 
 public class Form implements ComponentGenerator<JComponent> {
   private final ComponentGenerator<JComponent> layoutGenerator = new LayoutVertical();
@@ -12,8 +12,8 @@ public class Form implements ComponentGenerator<JComponent> {
 
   @Override
   public JComponent generate() {
-    var rows = Intgen.RANDOM.nextInt(1, 3);
-    var cols = Intgen.RANDOM.nextInt(2, 4);
+    var rows = Randoms.nextInt(1, 3);
+    var cols = Randoms.nextInt(2, 4);
 
     var main = layoutGenerator.generate();
     new TextFieldWithLeftLabel().add(main);
